@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const saleController_js_1 = require("../controllers/saleController.js");
+const authMiddleware_js_1 = require("../middleware/authMiddleware.js");
+const router = (0, express_1.Router)();
+router.use(authMiddleware_js_1.authMiddleware);
+router.post('/', saleController_js_1.createSale);
+router.get('/', saleController_js_1.getSales);
+router.get('/:id', saleController_js_1.getSaleById);
+router.post('/:id/payments', saleController_js_1.addPayment);
+router.patch('/:id/order-status', saleController_js_1.updateOrderStatus);
+exports.default = router;
