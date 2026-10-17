@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Customer, Frame, Lens, Accessory, Prescription } from '../types';
 import { StatusBadge } from '../components/Common/StatusBadge';
-import { ShoppingCart, ArrowLeft, Plus, Check, Sparkles, AlertCircle, User, Glasses, Layers } from 'lucide-react';
+import { ShoppingCart, ArrowLeft, Plus, Check, Sparkles, AlertCircle, User, Glasses, Layers, Package, Wrench, RotateCcw, FileText, CheckCircle2 } from 'lucide-react';
+import { OrganizedSelect } from '../components/Common/OrganizedSelect';
+import { useTheme } from '../context/ThemeContext';
 
 interface NewSalePageProps {
   initialCustomerId?: number;
@@ -19,6 +21,8 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
   onSuccess,
   onLaunchLensIQ,
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | ''>(initialCustomerId || '');
   const [customerPrescription, setCustomerPrescription] = useState<Prescription | null>(null);
@@ -48,85 +52,79 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
         const cUrl = initialCustomerId
           ? `/customers?dispensing_eligible=true&include_customer_id=${initialCustomerId}&limit=100`
           : '/customers?dispensing_eligible=true&limit=100';
+
         const [cRes, fRes, lRes, aRes] = await Promise.all([
           api.get<{ customers: Customer[] }>(cUrl),
           api.get<{ frames: Frame[] }>('/products/frames?inStock=true'),
           api.get<{ lenses: Lens[] }>('/products/lenses?inStock=true'),
-          api.get<{ accessories: Accessory[] }>('/products/accessories'),
+          api.get<{ accessories: Accessory[] }>('/products/accessories?inStock=true'),
         ]);
+
         setCustomers(cRes.customers || []);
         setFrames(fRes.frames || []);
         setLenses(lRes.lenses || []);
         setAccessories(aRes.accessories || []);
-      } catch (err) {
-        console.error('Failed to load catalogs:', err);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load POS catalog.');
       }
     }
     loadData();
   }, [initialCustomerId]);
 
+  // When customer changes, load their active prescription
   useEffect(() => {
-    if (initialCustomerId) {
-      setSelectedCustomerId(initialCustomerId);
+    if (!selectedCustomerId) {
+      setCustomerPrescription(null);
+      return;
     }
-  }, [initialCustomerId]);
-
-  useEffect(() => {
-    if (initialLensId) {
-      setSelectedLensId(initialLensId);
-    }
-  }, [initialLensId]);
-
-  // When customer changes, fetch latest prescription
-  useEffect(() => {
-    async function fetchRx() {
-      if (!selectedCustomerId) {
-        setCustomerPrescription(null);
-        return;
-      }
+    async function loadRx() {
       try {
-        const res = await api.get<{ customer: Customer; examinations: any[] }>(`/customers/${selectedCustomerId}`);
-        if (res.examinations && res.examinations.length > 0) {
-          setCustomerPrescription(res.examinations[0].prescription);
-        } else {
-          setCustomerPrescription(null);
-        }
-      } catch (err) {
-        console.error('Failed to load customer Rx:', err);
+        const rx = await api.get<Prescription>(`/prescriptions/customer/${selectedCustomerId}/latest`);
+        setCustomerPrescription(rx);
+      } catch {
+        setCustomerPrescription(null);
       }
     }
-    fetchRx();
+    loadRx();
   }, [selectedCustomerId]);
 
-  // Pricing Calculations
-  const selectedFrame = frames.find((f) => f.id === Number(selectedFrameId));
-  const selectedLens = lenses.find((l) => l.id === Number(selectedLensId));
-  const selectedAccessory = accessories.find((a) => a.id === Number(selectedAccessoryId));
+  // Auto-select initial lens if provided
+  useEffect(() => {
+    if (initialLensId && lenses.length > 0) {
+      setSelectedLensId(initialLensId);
+    }
+  }, [initialLensId, lenses]);
 
+  // Derived Objects
+  const selectedFrame = frames.find((f) => f.id === selectedFrameId);
+  const selectedLens = lenses.find((l) => l.id === selectedLensId);
+  const selectedAccessory = accessories.find((a) => a.id === selectedAccessoryId);
+
+  // Financial Calculations
   const framePrice = selectedFrame ? parseFloat(selectedFrame.selling_price as any) : 0;
   const lensPrice = selectedLens ? parseFloat(selectedLens.selling_price as any) : 0;
   const accessoryPrice = selectedAccessory ? parseFloat(selectedAccessory.selling_price as any) : 0;
 
   const subtotal = framePrice + lensPrice + accessoryPrice;
-  const rawDiscount = parseFloat(discountAmount) || 0;
-  const rawPaid = parseFloat(paidAmount) || 0;
+  const discount = Math.max(parseFloat(discountAmount) || 0, 0);
 
-  const discountError = rawDiscount < 0
-    ? 'Discount cannot be negative.'
-    : rawDiscount > subtotal && subtotal > 0
-    ? `Discount cannot exceed subtotal (LKR ${subtotal.toLocaleString('en-US')}).`
-    : null;
+  const discountError =
+    discount < 0
+      ? 'Discount cannot be negative.'
+      : discount > subtotal
+      ? `Discount cannot exceed subtotal (LKR ${subtotal.toLocaleString('en-US')}).`
+      : null;
 
-  const discount = Math.min(Math.max(0, rawDiscount), subtotal);
-  const totalAmount = Math.max(subtotal - discount, 0);
+  const totalAmount = Math.max(subtotal - (discountError ? 0 : discount), 0);
+  const advancePaid = Math.max(parseFloat(paidAmount) || 0, 0);
 
-  const paidError = rawPaid < 0
-    ? 'Advance deposit cannot be negative.'
-    : rawPaid > totalAmount && totalAmount > 0
-    ? `Advance deposit cannot exceed total payable (LKR ${totalAmount.toLocaleString('en-US')}).`
-    : null;
+  const paidError =
+    advancePaid < 0
+      ? 'Advance deposit cannot be negative.'
+      : advancePaid > totalAmount
+      ? `Advance deposit cannot exceed total payable (LKR ${totalAmount.toLocaleString('en-US')}).`
+      : null;
 
-  const advancePaid = Math.min(Math.max(0, rawPaid), totalAmount);
   const balanceDue = Math.max(totalAmount - advancePaid, 0);
 
   const executeSaleSubmission = async () => {
@@ -241,7 +239,7 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
             <div>
               <h1 style={{ fontSize: 22, margin: '0 0 2px' }}>Optical Dispensing Sale &amp; Billing</h1>
               <div className="sub">
-                Indian Optician, Nintavur · Point-of-Sale with automated inventory deduction
+                Indian Optician, Nintavur &bull; Point-of-Sale with automated inventory deduction
               </div>
             </div>
           </div>
@@ -264,28 +262,37 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
 
           {/* Select Customer */}
           <div className="f">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-              <label style={{ margin: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ margin: 0, fontWeight: 600 }}>
                 Select Patient / Customer <span className="req">*</span>
               </label>
               <span className="badge" style={{ fontSize: 11, background: 'var(--portal-bg)', color: 'var(--text-muted)' }}>
                 {customers.length} Examined Patients Ready
               </span>
             </div>
-            <div className="in">
-              <select
-                value={selectedCustomerId}
-                onChange={(e) => setSelectedCustomerId(Number(e.target.value))}
-                required
-              >
-                <option value="">— Choose Examined Patient Ready for Dispensing —</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.full_name} ({c.customer_code} · {c.phone_number})
-                  </option>
-                ))}
-              </select>
-            </div>
+            <OrganizedSelect
+              value={selectedCustomerId}
+              onChange={(val) => setSelectedCustomerId(val ? Number(val) : '')}
+              required
+              placeholder="— Choose Examined Patient Ready for Dispensing —"
+              leadingIcon={<User size={16} />}
+              options={[
+                {
+                  value: '',
+                  label: '— Choose Examined Patient Ready for Dispensing —',
+                  subtitle: 'Select from queue of examined patients ready for dispensing',
+                  isNoneOption: true,
+                },
+                ...customers.map((c) => ({
+                  value: c.id,
+                  label: c.full_name,
+                  code: c.customer_code,
+                  subtitle: `Tel: ${c.phone_number || 'No phone recorded'} • Clinical Examination Ready`,
+                  stockLabel: 'Ready for POS',
+                  stockStatus: 'IN_STOCK' as const,
+                })),
+              ]}
+            />
             {customers.length === 0 && (
               <div className="note n-info" style={{ marginTop: 6, fontSize: 12 }}>
                 <span>No pending unbilled patients. All examined patients currently have an order, or a new customer needs an eye examination first.</span>
@@ -319,44 +326,54 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
 
           {/* Select Frame */}
           <div className="f">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ margin: 0 }}>Spectacle Frame Model</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ margin: 0, fontWeight: 600 }}>Spectacle Frame Model</label>
               {selectedFrame && (
                 <span className="badge b-ok" style={{ fontSize: 11, height: 20 }}>
                   Frame Code: {selectedFrame.frame_code || `#FRM-${selectedFrame.id}`}
                 </span>
               )}
             </div>
-            <div className="in">
-              <select
-                value={selectedFrameId}
-                onChange={(e) => setSelectedFrameId(Number(e.target.value) || '')}
-              >
-                <option value="">— None (Patient's Own Frame) —</option>
-                {frames.map((f) => {
+            <OrganizedSelect
+              value={selectedFrameId}
+              onChange={(val) => setSelectedFrameId(val ? Number(val) : '')}
+              placeholder="— None (Patient's Own Frame) —"
+              leadingIcon={<Glasses size={16} />}
+              options={[
+                {
+                  value: '',
+                  label: "— None (Patient's Own Frame) —",
+                  subtitle: "Customer provided their own spectacle frame for re-glaze",
+                  isNoneOption: true,
+                },
+                ...frames.map((f) => {
                   const isOutOfStock = f.stock_quantity === 0;
                   const isLowStock = !isOutOfStock && f.stock_quantity <= (f.low_stock_threshold || 2);
                   const stockLabel = isOutOfStock
-                    ? '⚠️ OUT OF STOCK'
+                    ? 'OUT OF STOCK'
                     : isLowStock
-                    ? `⚠️ Low Stock (${f.stock_quantity})`
+                    ? `Low Stock (${f.stock_quantity})`
                     : `Stock: ${f.stock_quantity}`;
-                  return (
-                    <option key={f.id} value={f.id}>
-                      {f.frame_code ? `[${f.frame_code}] ` : ''}{f.brand} {f.model_name || f.model_number || ''} ({f.color}, {f.material}) — LKR {parseFloat(f.selling_price as any).toLocaleString('en-US')} ({stockLabel})
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+                  return {
+                    value: f.id,
+                    label: `${f.brand} ${f.model_name || f.model_number || ''}`,
+                    code: f.frame_code,
+                    subtitle: `${f.color ? f.color + ' • ' : ''}${f.material || ''}${f.shape ? ' • ' + f.shape : ''}`,
+                    price: f.selling_price,
+                    stockStatus: isOutOfStock ? ('OUT_OF_STOCK' as const) : isLowStock ? ('LOW_STOCK' as const) : ('IN_STOCK' as const),
+                    stockLabel,
+                  };
+                }),
+              ]}
+            />
             {selectedFrame && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                 <StatusBadge
                   status={selectedFrame.stock_quantity === 0 ? 'CRITICAL' : selectedFrame.stock_quantity <= (selectedFrame.low_stock_threshold || 2) ? 'WARNING' : 'ACTIVE'}
                   label={selectedFrame.stock_quantity === 0 ? 'Out of Stock Warning (0 in store)' : selectedFrame.stock_quantity <= (selectedFrame.low_stock_threshold || 2) ? `Low Stock Warning (${selectedFrame.stock_quantity} left)` : `In Stock (${selectedFrame.stock_quantity} units available)`}
                 />
                 <span className="sub" style={{ fontSize: 12 }}>
-                  {selectedFrame.shape} · {selectedFrame.material} · Size: {selectedFrame.size || 'Standard'}
+                  {selectedFrame.shape} &bull; {selectedFrame.material} &bull; Size: {selectedFrame.size || 'Standard'}
                 </span>
               </div>
             )}
@@ -364,8 +381,8 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
 
           {/* Select Lens */}
           <div className="f">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ margin: 0 }}>Ophthalmic Lens Pair</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ margin: 0, fontWeight: 600 }}>Ophthalmic Lens Pair</label>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 {selectedLens && (
                   <span className="badge b-info" style={{ fontSize: 11, height: 20 }}>
@@ -385,24 +402,34 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
                 )}
               </div>
             </div>
-            <div className="in">
-              <select
-                value={selectedLensId}
-                onChange={(e) => setSelectedLensId(Number(e.target.value) || '')}
-              >
-                <option value="">— None / Frame Only —</option>
-                {lenses.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.lens_code ? `[${l.lens_code}] ` : ''}{l.name} ({l.material}, Index {l.refractive_index}) — LKR {parseFloat(l.selling_price as any).toLocaleString('en-US')}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <OrganizedSelect
+              value={selectedLensId}
+              onChange={(val) => setSelectedLensId(val ? Number(val) : '')}
+              placeholder="— None / Frame Only —"
+              leadingIcon={<Layers size={16} />}
+              options={[
+                {
+                  value: '',
+                  label: "— None / Frame Only —",
+                  subtitle: "Frame only purchase or lenses sourced separately",
+                  isNoneOption: true,
+                },
+                ...lenses.map((l) => ({
+                  value: l.id,
+                  label: l.name || (l.brand + ' (' + (l.design_type || 'Lens') + ')'),
+                  code: l.lens_code,
+                  subtitle: `${l.material} • Index ${l.refractive_index}${l.design_type ? ' • ' + l.design_type : ''}`,
+                  price: l.selling_price,
+                  stockLabel: `Index ${l.refractive_index}`,
+                  stockStatus: 'IN_STOCK' as const,
+                })),
+              ]}
+            />
             {selectedLens && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                 <StatusBadge variant="ok" label="Optical Lens Pair Active" icon="check" />
                 <span className="sub" style={{ fontSize: 12 }}>
-                  Index {selectedLens.refractive_index} · {selectedLens.design_type || 'Single Vision'}
+                  Index {selectedLens.refractive_index} &bull; {selectedLens.design_type || 'Single Vision'}
                 </span>
               </div>
             )}
@@ -410,38 +437,48 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
 
           {/* Select Accessory */}
           <div className="f">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ margin: 0 }}>Optical Accessories (Case, Lens Cleaning Spray, Cord)</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ margin: 0, fontWeight: 600 }}>Optical Accessories (Case, Lens Cleaning Spray, Cord)</label>
               {selectedAccessory && (
                 <span className="badge b-ok" style={{ fontSize: 11, height: 20 }}>
                   Item Code: {selectedAccessory.item_code || `#ACC-${selectedAccessory.id}`}
                 </span>
               )}
             </div>
-            <div className="in">
-              <select
-                value={selectedAccessoryId}
-                onChange={(e) => setSelectedAccessoryId(Number(e.target.value) || '')}
-              >
-                <option value="">— None —</option>
-                {accessories.map((a) => {
+            <OrganizedSelect
+              value={selectedAccessoryId}
+              onChange={(val) => setSelectedAccessoryId(val ? Number(val) : '')}
+              placeholder="— None —"
+              leadingIcon={<Package size={16} />}
+              options={[
+                {
+                  value: '',
+                  label: "— None —",
+                  subtitle: "No extra care kit or optical accessory",
+                  isNoneOption: true,
+                },
+                ...accessories.map((a) => {
                   const isOutOfStock = a.stock_quantity === 0;
                   const isLowStock = !isOutOfStock && a.stock_quantity <= (a.low_stock_threshold || 5);
                   const stockLabel = isOutOfStock
-                    ? '⚠️ OUT OF STOCK'
+                    ? 'OUT OF STOCK'
                     : isLowStock
-                    ? `⚠️ Low Stock (${a.stock_quantity})`
+                    ? `Low Stock (${a.stock_quantity})`
                     : `Stock: ${a.stock_quantity}`;
-                  return (
-                    <option key={a.id} value={a.id}>
-                      {a.item_code ? `[${a.item_code}] ` : ''}{a.name} — LKR {parseFloat(a.selling_price as any).toLocaleString('en-US')} ({stockLabel})
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
+                  return {
+                    value: a.id,
+                    label: a.name,
+                    code: a.item_code,
+                    subtitle: 'Optical dispensing add-on accessory',
+                    price: a.selling_price,
+                    stockStatus: isOutOfStock ? ('OUT_OF_STOCK' as const) : isLowStock ? ('LOW_STOCK' as const) : ('IN_STOCK' as const),
+                    stockLabel,
+                  };
+                }),
+              ]}
+            />
             {selectedAccessory && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                 <StatusBadge
                   status={selectedAccessory.stock_quantity === 0 ? 'CRITICAL' : selectedAccessory.stock_quantity <= (selectedAccessory.low_stock_threshold || 5) ? 'WARNING' : 'ACTIVE'}
                   label={selectedAccessory.stock_quantity === 0 ? 'Out of Stock Warning (0 in store)' : selectedAccessory.stock_quantity <= (selectedAccessory.low_stock_threshold || 5) ? `Low Stock Warning (${selectedAccessory.stock_quantity} left)` : `In Stock (${selectedAccessory.stock_quantity} units available)`}
@@ -450,55 +487,314 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
             )}
           </div>
 
-          {/* Workshop Notes / Glazing Instructions (Hybrid Approach) */}
-          <div className="f">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <label style={{ margin: 0 }}>Laboratory / Fitting Glazing Instructions</label>
-              <span className="sub" style={{ fontSize: 12 }}>Click preset to auto-fill or type bespoke notes</span>
-            </div>
+          {/* Laboratory / Fitting Glazing Instructions Section (Theme-Adaptive & White Input) */}
+          <div
+            style={{
+              marginTop: 6,
+              borderRadius: 16,
+              border: '1.5px solid var(--border-color, #cbd5e1)',
+              background: 'var(--portal-bg, #f8fafc)',
+              boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.05)',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+              transition: 'background-color 0.2s ease, border-color 0.2s ease',
+            }}
+          >
+            {/* Top Multi-tone Glowing Gradient Beam */}
+            <div
+              style={{
+                height: 2.5,
+                width: '100%',
+                background: 'linear-gradient(90deg, #0284c7 0%, #6366f1 35%, #a855f7 65%, #ec4899 100%)',
+                opacity: 0.85,
+              }}
+            />
 
-            {/* Quick Presets Chips */}
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-              {[
-                'Full-Rim V-Bevel',
-                'Supra Nylon Grooving (0.5mm)',
-                'Rimless Drill & Screw Mount',
-                'High-Minus Edge Polishing',
-                'Patient Own Frame (POF) Re-glaze',
-              ].map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => {
-                    if (!notes) {
-                      setNotes(preset);
-                    } else if (!notes.includes(preset)) {
-                      setNotes(`${notes}; ${preset}`);
-                    }
-                  }}
-                  className="badge"
+            {/* Lab Section Header */}
+            <div
+              style={{
+                padding: '14px 18px',
+                background: 'var(--surface-card, #ffffff)',
+                borderBottom: '1px solid var(--border-color, #e2e8f0)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 10,
+                transition: 'background-color 0.2s ease, border-color 0.2s ease',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span
                   style={{
-                    cursor: 'pointer',
-                    background: notes.includes(preset) ? 'var(--focus-glow)' : 'var(--portal-bg)',
-                    borderColor: notes.includes(preset) ? 'var(--lens-violet)' : 'var(--border-color)',
-                    color: notes.includes(preset) ? 'var(--lens-violet)' : 'var(--text-ink)',
-                    fontSize: 11.5,
-                    padding: '3px 8px',
-                    transition: 'all 0.15s ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 34,
+                    height: 34,
+                    borderRadius: 10,
+                    background: 'linear-gradient(135deg, #0284c7 0%, #6366f1 100%)',
+                    color: '#ffffff',
+                    boxShadow: '0 3px 10px rgba(14, 165, 233, 0.35)',
+                    flexShrink: 0,
                   }}
                 >
-                  + {preset}
+                  <Wrench size={16} />
+                </span>
+                <div>
+                  <label style={{ margin: 0, fontSize: 14.5, fontWeight: 700, color: 'var(--text-ink, #0f172a)' }}>
+                    Laboratory / Fitting Glazing Instructions
+                  </label>
+                  <div style={{ fontSize: 11.5, marginTop: 1, color: 'var(--text-sub, #64748b)' }}>
+                    Click optical glazing presets to toggle or type bespoke workshop instructions
+                  </div>
+                </div>
+              </div>
+
+              {notes && (
+                <button
+                  type="button"
+                  onClick={() => setNotes('')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    background: 'var(--portal-bg, #f1f5f9)',
+                    border: '1px solid var(--border-color, #cbd5e1)',
+                    color: 'var(--text-sub, #64748b)',
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    padding: '4px 9px',
+                    borderRadius: 8,
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#dc2626';
+                    e.currentTarget.style.borderColor = 'rgba(220, 38, 38, 0.4)';
+                    e.currentTarget.style.background = 'rgba(220, 38, 38, 0.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--text-sub, #64748b)';
+                    e.currentTarget.style.borderColor = 'var(--border-color, #cbd5e1)';
+                    e.currentTarget.style.background = 'var(--portal-bg, #f1f5f9)';
+                  }}
+                  title="Clear glazing notes"
+                >
+                  <RotateCcw size={12} />
+                  <span>Reset / Clear</span>
                 </button>
-              ))}
+              )}
             </div>
 
-            <div className="in">
-              <input
-                type="text"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="e.g. Supra Nylon Grooving (0.5mm); Decenter 1.5mm inward, seg height 18mm..."
-              />
+            {/* Presets Grid - Theme-Synced Perfectly Visible Little Tag Boxes */}
+            <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {[
+                  {
+                    preset: 'Full-Rim V-Bevel',
+                    tag: 'Full-Rim',
+                    lightColor: '#0284c7',
+                    lightBg: 'rgba(2, 132, 199, 0.1)',
+                    lightBorder: 'rgba(2, 132, 199, 0.4)',
+                    darkColor: '#38bdf8',
+                    darkBg: 'rgba(56, 189, 248, 0.18)',
+                    darkBorder: 'rgba(56, 189, 248, 0.45)',
+                  },
+                  {
+                    preset: 'Supra Nylon Grooving (0.5mm)',
+                    tag: 'Semi-Rimless',
+                    lightColor: '#4f46e5',
+                    lightBg: 'rgba(99, 102, 241, 0.1)',
+                    lightBorder: 'rgba(99, 102, 241, 0.4)',
+                    darkColor: '#a5b4fc',
+                    darkBg: 'rgba(165, 180, 252, 0.18)',
+                    darkBorder: 'rgba(165, 180, 252, 0.45)',
+                  },
+                  {
+                    preset: 'Rimless Drill & Screw Mount',
+                    tag: 'Rimless Drill',
+                    lightColor: '#b45309',
+                    lightBg: 'rgba(217, 119, 6, 0.1)',
+                    lightBorder: 'rgba(217, 119, 6, 0.4)',
+                    darkColor: '#fcd34d',
+                    darkBg: 'rgba(252, 211, 77, 0.18)',
+                    darkBorder: 'rgba(252, 211, 77, 0.45)',
+                  },
+                  {
+                    preset: 'High-Minus Edge Polishing',
+                    tag: 'Edge Polish',
+                    lightColor: '#047857',
+                    lightBg: 'rgba(5, 150, 105, 0.1)',
+                    lightBorder: 'rgba(5, 150, 105, 0.4)',
+                    darkColor: '#6ee7b7',
+                    darkBg: 'rgba(110, 231, 183, 0.18)',
+                    darkBorder: 'rgba(110, 231, 183, 0.45)',
+                  },
+                  {
+                    preset: 'Patient Own Frame (POF) Re-glaze',
+                    tag: 'POF Re-Glaze',
+                    lightColor: '#be123c',
+                    lightBg: 'rgba(225, 29, 72, 0.1)',
+                    lightBorder: 'rgba(225, 29, 72, 0.4)',
+                    darkColor: '#fda4af',
+                    darkBg: 'rgba(253, 164, 175, 0.18)',
+                    darkBorder: 'rgba(253, 164, 175, 0.45)',
+                  },
+                ].map(({ preset, tag, lightColor, lightBg, lightBorder, darkColor, darkBg, darkBorder }) => {
+                  const isActive = notes.includes(preset);
+                  const tagColor = isActive ? '#ffffff' : (isDark ? darkColor : lightColor);
+                  const tagBg = isActive ? 'rgba(255, 69, 0, 0.3)' : (isDark ? darkBg : lightBg);
+                  const tagBorder = isActive ? '1px solid orangered' : `1px solid ${isDark ? darkBorder : lightBorder}`;
+
+                  return (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => {
+                        if (!notes) {
+                          setNotes(preset);
+                        } else if (notes.includes(preset)) {
+                          // Clean toggle off
+                          const parts = notes.split(';').map((p) => p.trim()).filter((p) => p && p !== preset);
+                          setNotes(parts.join('; '));
+                        } else {
+                          // Clean append
+                          setNotes(`${notes}; ${preset}`);
+                        }
+                      }}
+                      style={{
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 7,
+                        background: isActive ? 'linear-gradient(135deg, #1c1917 0%, #0c0a09 100%)' : 'transparent',
+                        border: isActive ? '2px solid orangered' : `1.5px solid ${isDark ? '#E9EEF3' : '#000000'}`,
+                        color: isActive ? '#ffffff' : (isDark ? '#E9EEF3' : '#000000'),
+                        boxShadow: isActive ? '0 0 0 2px rgba(255, 69, 0, 0.35), 0 4px 12px rgba(255, 69, 0, 0.25)' : 'none',
+                        fontSize: 12,
+                        fontWeight: isActive ? 700 : 600,
+                        padding: isActive ? '5px 11px' : '6px 12px',
+                        borderRadius: 10,
+                        transition: 'all 0.18s ease',
+                        transform: isActive ? 'translateY(-1px)' : 'none',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.borderColor = 'orangered';
+                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 69, 0, 0.2)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.transform = 'none';
+                          e.currentTarget.style.borderColor = isDark ? '#E9EEF3' : '#000000';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: 17,
+                          height: 17,
+                          borderRadius: '50%',
+                          background: isActive ? 'orangered' : 'transparent',
+                          color: isActive ? '#ffffff' : (isDark ? '#E9EEF3' : '#000000'),
+                          border: `1.5px solid ${isActive ? 'orangered' : (isDark ? '#E9EEF3' : '#000000')}`,
+                          fontSize: 10,
+                          fontWeight: 900,
+                          flexShrink: 0,
+                          transition: 'all 0.18s ease',
+                          boxShadow: isActive ? '0 1px 4px rgba(255, 69, 0, 0.5)' : 'none',
+                        }}
+                      >
+                        {isActive ? '✓' : '+'}
+                      </span>
+                      <span style={{ fontWeight: isActive ? 700 : 600 }}>{preset}</span>
+                      <span
+                        style={{
+                          fontSize: 10.5,
+                          fontWeight: 700,
+                          padding: '2px 7px',
+                          borderRadius: 5,
+                          background: tagBg,
+                          color: tagColor,
+                          border: tagBorder,
+                          letterSpacing: '0.02em',
+                          transition: 'all 0.18s ease',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          boxShadow: isDark ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 2px rgba(0, 0, 0, 0.04)',
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Bespoke Instruction Capsule Box (White background with dark text) */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  borderRadius: 12,
+                  background: '#ffffff',
+                  border: '1.5px solid var(--border-color, #cbd5e1)',
+                  padding: '7px 14px',
+                  transition: 'all 0.18s ease',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                }}
+              >
+                <FileText size={15} style={{ color: '#0284c7', flexShrink: 0 }} />
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. Full-Rim V-Bevel; Decenter 1.5mm inward, seg height 18mm, safety posterior bevel..."
+                  style={{
+                    border: 'none',
+                    outline: 'none',
+                    background: 'transparent',
+                    width: '100%',
+                    fontSize: 13,
+                    color: '#0f172a',
+                    padding: '6px 0',
+                    fontFamily: 'inherit',
+                  }}
+                  onFocus={(e) => {
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.style.borderColor = 'orangered';
+                      parent.style.boxShadow = '0 0 0 3px rgba(255, 69, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.05)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.style.borderColor = 'var(--border-color, #cbd5e1)';
+                      parent.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Footer text (without the directive count badge) */}
+              <div style={{ display: 'flex', alignItems: 'center', fontSize: 11.5, color: 'var(--text-sub, #64748b)' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <CheckCircle2 size={13} style={{ color: '#059669' }} />
+                  Glazing specifications will be printed on the spectacle workshop job docket
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -685,55 +981,25 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
                 <AlertCircle size={22} />
               </div>
               <div>
-                <h3 style={{ margin: '0 0 2px', fontSize: 17 }}>Confirm Zero Advance Deposit</h3>
-                <div className="sub" style={{ fontSize: 12 }}>
-                  Full payment will be deferred to spectacle collection
-                </div>
+                <h3 style={{ margin: 0, fontSize: 17 }}>Confirm Zero Advance Deposit</h3>
+                <span className="sub" style={{ fontSize: 12 }}>Optical Dispensing Payment Policy</span>
               </div>
             </div>
 
-            <div
-              style={{
-                padding: '14px 16px',
-                borderRadius: 12,
-                background: 'var(--portal-bg)',
-                border: '1px solid var(--border-color)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-              }}
-            >
-              <div className="kv" style={{ fontSize: 13 }}>
-                <span className="sub">Patient / Customer:</span>
-                <b>{customers.find((c) => c.id === Number(selectedCustomerId))?.full_name}</b>
-              </div>
-              <div className="kv" style={{ fontSize: 13 }}>
-                <span className="sub">Total Order Amount:</span>
-                <b className="tabular-nums">LKR {totalAmount.toLocaleString('en-US')}</b>
-              </div>
-              <div className="kv" style={{ fontSize: 13 }}>
-                <span className="sub">Advance Collected Now:</span>
-                <b className="tabular-nums" style={{ color: 'var(--status-warn)' }}>LKR 0.00</b>
-              </div>
-              <div className="kv" style={{ fontSize: 14, borderTop: '1px solid var(--border-subtle)', paddingTop: 6 }}>
-                <span style={{ fontWeight: 600 }}>Due on Collection:</span>
-                <b className="tabular-nums" style={{ color: 'var(--status-bad)' }}>
-                  LKR {totalAmount.toLocaleString('en-US')}
-                </b>
-              </div>
-            </div>
-
-            <p style={{ margin: 0, fontSize: 13, color: 'var(--text-ink)', lineHeight: 1.5 }}>
-              Are you sure you want to place this order with <b>LKR 0 advance deposit</b>? The workshop glazing job will proceed, and the full total of <b>LKR {totalAmount.toLocaleString('en-US')}</b> will be settled when the customer collects their spectacles.
+            <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5, color: 'var(--text-ink)' }}>
+              No advance deposit has been entered (LKR 0.00). The total order amount of{' '}
+              <b className="tabular-nums">LKR {totalAmount.toLocaleString('en-US')}</b> will remain as outstanding
+              balance payable upon collection.
             </p>
 
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 6 }}>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
               <button
                 type="button"
                 className="btn s"
                 onClick={() => setShowZeroAdvanceModal(false)}
+                disabled={submitting}
               >
-                Go Back &amp; Enter Deposit
+                Go Back &amp; Enter Advance
               </button>
               <button
                 type="button"
@@ -741,7 +1007,8 @@ export const NewSalePage: React.FC<NewSalePageProps> = ({
                 onClick={executeSaleSubmission}
                 disabled={submitting}
               >
-                {submitting ? 'Placing Order...' : 'Confirm & Place Order'}
+                <Check size={16} />
+                <span>Confirm &amp; Proceed (LKR 0 Advance)</span>
               </button>
             </div>
           </div>

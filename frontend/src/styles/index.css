@@ -479,8 +479,8 @@ h1, h2, h3, h4, h5, h6 {
   max-width: 640px;
   max-height: 90vh;
   overflow-y: auto;
-  background: #FFFFFF;
-  border: 1px solid rgba(226, 232, 240, 0.85);
+  background: var(--surface-card, #FFFFFF);
+  border: 1px solid var(--border-color, rgba(226, 232, 240, 0.85));
   border-radius: 18px;
   box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.04);
   display: flex;
@@ -488,6 +488,29 @@ h1, h2, h3, h4, h5, h6 {
   margin: auto;
   animation: opModalCardSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform-origin: center center;
+}
+
+:root[data-theme="dark"] .op-modal-backdrop {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+:root[data-theme="dark"] .op-modal-card {
+  background: #18222e;
+  border: 1.5px solid #3b4d61;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme="dark"] .op-modal-header {
+  border-bottom: 1px solid #2d3d4f;
+}
+
+:root[data-theme="dark"] .op-modal-title {
+  color: #f8fafc;
+}
+
+:root[data-theme="dark"] .op-modal-footer {
+  background-color: #131c26;
+  border-top: 1px solid #2d3d4f;
 }
 
 .op-modal-card.op-modal-lg {
@@ -557,7 +580,7 @@ h1, h2, h3, h4, h5, h6 {
    ======================================================== */
 .op-rail-kpi {
   flex: 1;
-  background: #FFFFFF;
+  background: var(--surface-card, #FFFFFF);
   border: 1px solid var(--border-color, #E2E8F0);
   border-radius: 16px;
   padding: 20px 22px;
@@ -565,26 +588,76 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
   align-items: stretch;
   position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   overflow: hidden;
 }
 
 .op-rail-kpi:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
+/* Light Theme High-Intensity Exact Swatch Palettes */
+/* Palette 1 (Green/Teal): #051F20, #0B2B26, #163832, #235347, #8EB69B, #DAF1DE */
+.op-rail-kpi.card-green,
 .op-rail-kpi.card-blue {
-  background: radial-gradient(circle at top right, rgba(219, 234, 254, 0.55) 0%, rgba(255, 255, 255, 0) 65%), #FFFFFF;
+  background: linear-gradient(135deg, #8EB69B 0%, #B2DCBE 42%, #DAF1DE 100%);
+  border: 1.5px solid #235347;
+  box-shadow: 0 6px 20px rgba(35, 83, 71, 0.16), 0 2px 6px rgba(11, 43, 38, 0.1);
 }
 
+.op-rail-kpi.card-green:hover,
+.op-rail-kpi.card-blue:hover {
+  box-shadow: 0 12px 30px rgba(35, 83, 71, 0.28);
+}
+
+/* Palette 2 (Blue/Navy): #021024, #052659, #5483B3, #7DA0CA, #C1E8FF */
+.op-rail-kpi.card-blue-palette,
 .op-rail-kpi.card-amber {
-  background: radial-gradient(circle at top right, rgba(254, 243, 199, 0.6) 0%, rgba(255, 255, 255, 0) 65%), #FFFFFF;
+  background: linear-gradient(135deg, #7DA0CA 0%, #A2C8EC 42%, #C1E8FF 100%);
+  border: 1.5px solid #052659;
+  box-shadow: 0 6px 20px rgba(5, 38, 89, 0.16), 0 2px 6px rgba(2, 16, 36, 0.1);
 }
 
+.op-rail-kpi.card-blue-palette:hover,
+.op-rail-kpi.card-amber:hover {
+  box-shadow: 0 12px 30px rgba(5, 38, 89, 0.28);
+}
+
+/* Palette 3 (Mocha/Espresso): #291C0E, #6E473B, #A78D78, #BEB5A9, #E1D4C2 */
+.op-rail-kpi.card-mocha,
 .op-rail-kpi.card-red {
-  background: radial-gradient(circle at top right, rgba(254, 226, 226, 0.6) 0%, rgba(255, 255, 255, 0) 65%), #FFFFFF;
+  background: linear-gradient(135deg, #A78D78 0%, #C8B8A8 42%, #E1D4C2 100%);
+  border: 1.5px solid #6E473B;
+  box-shadow: 0 6px 20px rgba(110, 71, 59, 0.16), 0 2px 6px rgba(41, 28, 14, 0.1);
+}
+
+.op-rail-kpi.card-mocha:hover,
+.op-rail-kpi.card-red:hover {
+  box-shadow: 0 12px 30px rgba(110, 71, 59, 0.28);
+}
+
+/* Dark Theme Specific Multi-Palette Styles */
+:root[data-theme="dark"] .op-rail-kpi.card-green,
+:root[data-theme="dark"] .op-rail-kpi.card-blue {
+  background: linear-gradient(135deg, #051F20 0%, #0B2B26 50%, #163832 100%);
+  border: 1.5px solid rgba(142, 182, 155, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(142, 182, 155, 0.12);
+}
+
+:root[data-theme="dark"] .op-rail-kpi.card-blue-palette,
+:root[data-theme="dark"] .op-rail-kpi.card-amber {
+  background: linear-gradient(135deg, #021024 0%, #052659 50%, #173256 100%);
+  border: 1.5px solid rgba(125, 160, 202, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(125, 160, 202, 0.12);
+}
+
+:root[data-theme="dark"] .op-rail-kpi.card-mocha,
+:root[data-theme="dark"] .op-rail-kpi.card-red {
+  background: linear-gradient(135deg, #291C0E 0%, #3d2716 50%, #4a301d 100%);
+  border: 1.5px solid rgba(190, 181, 169, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(190, 181, 169, 0.12);
 }
 
 .op-rail-left {
@@ -674,3 +747,20 @@ h1, h2, h3, h4, h5, h6 {
   transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+
+:root[data-theme="dark"] .op-rail-header {
+  color: #f8fafc;
+}
+
+:root[data-theme="dark"] .op-rail-value {
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .op-rail-sub {
+  color: #a6b3c1;
+}
+
+:root[data-theme="dark"] .op-rail-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  color: #a6b3c1;
+}

@@ -1037,9 +1037,10 @@ h1, h2, h3, h4, h5, h6, .serif {
   border: 1px solid rgba(183, 170, 255, 0.35);
 }
 
-.b-n {
+.b-n,
+.b-neutral {
   background: var(--portal-bg);
-  color: var(--text-sub);
+  color: var(--text-ink);
   border: 1px solid var(--border-color);
 }
 
@@ -1209,7 +1210,7 @@ select.in, .sel {
   color: var(--text-sub);
   border-radius: 18px;
   font-weight: 600;
-  border: 1px solid transparent;
+  border: 1.5px solid #ffffff;
   cursor: pointer;
   background: transparent;
   transition: all 0.15s ease;
@@ -1218,6 +1219,7 @@ select.in, .sel {
 .tab:hover {
   color: var(--text-ink);
   background: var(--side-hover-bg);
+  border-color: #ffffff;
 }
 
 .tab.on {
@@ -1225,6 +1227,16 @@ select.in, .sel {
   background: var(--surface-card);
   border-color: var(--border-color);
   box-shadow: var(--shadow-sm);
+}
+
+:root[data-theme="dark"] .tab:not(.on) {
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  color: var(--text-sub);
+}
+
+:root[data-theme="dark"] .tab:not(.on):hover {
+  border-color: #ffffff;
+  color: var(--text-ink);
 }
 
 .chip {

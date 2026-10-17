@@ -996,11 +996,12 @@ export const ProductsPage: React.FC = () => {
                     width: 40,
                     height: 40,
                     borderRadius: '10px',
-                    background: 'rgba(30, 41, 59, 0.08)',
-                    color: 'var(--color-primary-navy, #1E293B)',
+                    background: 'var(--portal-bg, rgba(30, 41, 59, 0.08))',
+                    color: 'var(--primary-action, #1E293B)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    border: '1px solid var(--border-color, transparent)',
                   }}
                 >
                   <Edit2 size={20} />
@@ -1009,7 +1010,7 @@ export const ProductsPage: React.FC = () => {
                   <h2 className="op-modal-title">
                     Edit {editingProduct.type === 'FRAME' ? 'Spectacle Frame' : editingProduct.type === 'LENS' ? 'Optical Lens' : 'Accessory'}
                   </h2>
-                  <div style={{ fontSize: 12.5, color: 'var(--color-text-secondary, #64748B)' }}>
+                  <div style={{ fontSize: 12.5, color: 'var(--text-sub, #64748B)' }}>
                     Correct any typographical mistakes or update pricing/thresholds
                   </div>
                 </div>
@@ -1156,16 +1157,17 @@ export const ProductsPage: React.FC = () => {
                     </div>
                     <div className="f">
                       <label>Primary Supplier <span className="req">*</span></label>
-                      <select
-                        className="in sel"
-                        value={editSupplierId}
-                        onChange={(e) => setEditSupplierId(parseInt(e.target.value, 10))}
-                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                      >
-                        {suppliers.map((s) => (
-                          <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
-                        ))}
-                      </select>
+                      <div className="in">
+                        <select
+                          value={editSupplierId}
+                          onChange={(e) => setEditSupplierId(parseInt(e.target.value, 10))}
+                          style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                        >
+                          {suppliers.map((s) => (
+                            <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -1204,16 +1206,17 @@ export const ProductsPage: React.FC = () => {
                   <div className="row" style={{ gap: 12 }}>
                     <div className="f">
                       <label>Design Type</label>
-                      <select
-                        className="in sel"
-                        value={editDesign}
-                        onChange={(e: any) => setEditDesign(e.target.value)}
-                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                      >
-                        <option value="SINGLE_VISION">Single Vision</option>
-                        <option value="BIFOCAL">Bifocal</option>
-                        <option value="PROGRESSIVE">Progressive</option>
-                      </select>
+                      <div className="in">
+                        <select
+                          value={editDesign}
+                          onChange={(e: any) => setEditDesign(e.target.value)}
+                          style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                        >
+                          <option value="SINGLE_VISION">Single Vision</option>
+                          <option value="BIFOCAL">Bifocal</option>
+                          <option value="PROGRESSIVE">Progressive</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="f">
                       <label>Refractive Index</label>
@@ -1333,16 +1336,17 @@ export const ProductsPage: React.FC = () => {
 
                   <div className="f">
                     <label>Supplier <span className="req">*</span></label>
-                    <select
-                      className="in sel"
-                      value={editSupplierId}
-                      onChange={(e) => setEditSupplierId(parseInt(e.target.value, 10))}
-                      style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                    >
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
-                      ))}
-                    </select>
+                    <div className="in">
+                      <select
+                        value={editSupplierId}
+                        onChange={(e) => setEditSupplierId(parseInt(e.target.value, 10))}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                      >
+                        {suppliers.map((s) => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </>
               )}
@@ -1408,16 +1412,17 @@ export const ProductsPage: React.FC = () => {
 
                   <div className="f">
                     <label>Supplier <span className="req">*</span></label>
-                    <select
-                      className="in sel"
-                      value={editSupplierId}
-                      onChange={(e) => setEditSupplierId(parseInt(e.target.value, 10))}
-                      style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                    >
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
-                      ))}
-                    </select>
+                    <div className="in">
+                      <select
+                        value={editSupplierId}
+                        onChange={(e) => setEditSupplierId(parseInt(e.target.value, 10))}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                      >
+                        {suppliers.map((s) => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </>
               )}
@@ -1636,16 +1641,17 @@ export const ProductsPage: React.FC = () => {
 
                   <div className="f">
                     <label>Supplier <span className="req">*</span></label>
-                    <select
-                      className="in sel"
-                      value={frameSupplierId}
-                      onChange={(e) => setFrameSupplierId(parseInt(e.target.value, 10))}
-                      style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                    >
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
-                      ))}
-                    </select>
+                    <div className="in">
+                      <select
+                        value={frameSupplierId}
+                        onChange={(e) => setFrameSupplierId(parseInt(e.target.value, 10))}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                      >
+                        {suppliers.map((s) => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </>
               )}
@@ -1683,16 +1689,17 @@ export const ProductsPage: React.FC = () => {
                   <div className="row" style={{ gap: 12 }}>
                     <div className="f">
                       <label>Design Type</label>
-                      <select
-                        className="in sel"
-                        value={lensDesign}
-                        onChange={(e: any) => setLensDesign(e.target.value)}
-                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                      >
-                        <option value="SINGLE_VISION">Single Vision</option>
-                        <option value="BIFOCAL">Bifocal</option>
-                        <option value="PROGRESSIVE">Progressive</option>
-                      </select>
+                      <div className="in">
+                        <select
+                          value={lensDesign}
+                          onChange={(e: any) => setLensDesign(e.target.value)}
+                          style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                        >
+                          <option value="SINGLE_VISION">Single Vision</option>
+                          <option value="BIFOCAL">Bifocal</option>
+                          <option value="PROGRESSIVE">Progressive</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="f">
                       <label>Refractive Index</label>
@@ -1801,16 +1808,17 @@ export const ProductsPage: React.FC = () => {
 
                   <div className="f">
                     <label>Supplier <span className="req">*</span></label>
-                    <select
-                      className="in sel"
-                      value={lensSupplierId}
-                      onChange={(e) => setLensSupplierId(parseInt(e.target.value, 10))}
-                      style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                    >
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
-                      ))}
-                    </select>
+                    <div className="in">
+                      <select
+                        value={lensSupplierId}
+                        onChange={(e) => setLensSupplierId(parseInt(e.target.value, 10))}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                      >
+                        {suppliers.map((s) => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </>
               )}
@@ -1892,16 +1900,17 @@ export const ProductsPage: React.FC = () => {
 
                   <div className="f">
                     <label>Supplier <span className="req">*</span></label>
-                    <select
-                      className="in sel"
-                      value={accSupplierId}
-                      onChange={(e) => setAccSupplierId(parseInt(e.target.value, 10))}
-                      style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
-                    >
-                      {suppliers.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
-                      ))}
-                    </select>
+                    <div className="in">
+                      <select
+                        value={accSupplierId}
+                        onChange={(e) => setAccSupplierId(parseInt(e.target.value, 10))}
+                        style={{ border: 'none', background: 'transparent', outline: 'none', width: '100%', color: 'var(--text-ink)', cursor: 'pointer' }}
+                      >
+                        {suppliers.map((s) => (
+                          <option key={s.id} value={s.id}>{s.name} ({s.supplier_code})</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </>
               )}

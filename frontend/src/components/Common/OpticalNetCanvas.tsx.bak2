@@ -1,0 +1,545 @@
+import React, { useEffect, useRef } from 'react';
+
+interface OpticalNetCanvasProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+interface RippleDrop {
+  x: number;
+  y: number;
+  radius: number;
+  maxRadius: number;
+  alpha: number;
+  speed: number;
+  color: string;
+}
+
+interface DewParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  baseRadius: number;
+  phase: number;
+  alpha: number;
+  color: string;
+}
+
+export const OpticalNetCanvas: React.FC<OpticalNetCanvasProps> = ({ className = '', style }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = (canvas.width = container.clientWidth);
+    let height = (canvas.height = container.clientHeight);
+
+    // Mouse tracking with viscous fluid dampening (spring-lerp)
+    const mouse = {
+      x: width * 0.74,
+      y: height * 0.42,
+      targetX: width * 0.74,
+      targetY: height * 0.42,
+      vx: 0,
+      vy: 0,
+      speed: 0,
+      active: false,
+    };
+
+    // User-induced click ripples (pebble drops)
+    const clickRipples: RippleDrop[] = [];
+
+    // Ambient floating water droplets / plankton particles
+    const PARTICLE_COUNT = 32;
+    const particles: DewParticle[] = [];
+    const particleColors = ['#00F0FF', '#1E9AA8', '#6C5CE7', '#C2408E', '#FFFFFF'];
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        baseRadius: 1.2 + Math.random() * 2.2,
+        phase: Math.random() * Math.PI * 2,
+        alpha: 0.2 + Math.random() * 0.45,
+        color: particleColors[Math.floor(Math.random() * particleColors.length)],
+      });
+    }
+
+    // High-DPI support
+    const handleResize = () => {
+      if (!container || !canvas) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = container.clientWidth;
+      height = container.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      mouse.targetX = e.clientX - rect.left;
+      mouse.targetY = e.clientY - rect.top;
+      mouse.active = true;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.active = false;
+      mouse.targetX = width * 0.74;
+      mouse.targetY = height * 0.42;
+    };
+
+    const handleClick = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      // Spawn two staggered ripple wavefronts
+      clickRipples.push({
+        x: clickX,
+        y: clickY,
+        radius: 0,
+        maxRadius: Math.min(width, height) * 0.65,
+        alpha: 0.9,
+        speed: 3.5,
+        color: '#00F0FF',
+      });
+      setTimeout(() => {
+        clickRipples.push({
+          x: clickX,
+          y: clickY,
+          radius: 0,
+          maxRadius: Math.min(width, height) * 0.55,
+          alpha: 0.7,
+          speed: 2.8,
+          color: '#6C5CE7',
+        });
+      }, 140);
+    };
+
+    container.addEventListener('mousemove', handleMouseMove);
+    container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('click', handleClick);
+
+    // Number of harmonic wave rings
+    const WAVE_RING_COUNT = 8;
+    // Fluid wave parameters
+    const WAVE_PALETTES = [
+      { stroke: '#00F0FF', glow: 'rgba(0, 240, 255, 0.45)', shadow: 'rgba(0, 240, 255, 0.25)' }, // Radiant Aqua
+      { stroke: '#1E9AA8', glow: 'rgba(30, 154, 168, 0.42)', shadow: 'rgba(30, 154, 168, 0.22)' }, // Pure Opto Teal
+      { stroke: '#2563EB', glow: 'rgba(37, 99, 235, 0.38)', shadow: 'rgba(37, 99, 235, 0.20)' }, // Deep Electric Blue
+      { stroke: '#4F46E5', glow: 'rgba(79, 70, 229, 0.40)', shadow: 'rgba(79, 70, 229, 0.20)' }, // Indigo Horizon
+      { stroke: '#6C5CE7', glow: 'rgba(108, 92, 231, 0.42)', shadow: 'rgba(108, 92, 231, 0.22)' }, // Lens Violet
+      { stroke: '#9B51E0', glow: 'rgba(155, 81, 224, 0.38)', shadow: 'rgba(155, 81, 224, 0.20)' }, // Prismatic Orchid
+      { stroke: '#C2408E', glow: 'rgba(194, 64, 142, 0.35)', shadow: 'rgba(194, 64, 142, 0.18)' }, // Magenta Shimmer
+      { stroke: '#E0E7FF', glow: 'rgba(255, 255, 255, 0.30)', shadow: 'rgba(255, 255, 255, 0.15)' }, // Crystalline White
+    ];
+
+    // Number of perimeter sample vertices for silky smooth curved wave contours
+    const VERTEX_COUNT = 72; // Every 5 degrees for fluid organic curve
+
+    const startTime = performance.now();
+
+    // Render Loop
+    const render = (now: number) => {
+      const timeSec = (now - startTime) * 0.001;
+
+      // Inertial mouse dampening (creates subtle fluid drag)
+      const prevX = mouse.x;
+      const prevY = mouse.y;
+      mouse.x += (mouse.targetX - mouse.x) * 0.055;
+      mouse.y += (mouse.targetY - mouse.y) * 0.055;
+      mouse.speed = Math.hypot(mouse.x - prevX, mouse.y - prevY);
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Base water center anchor (positioned smoothly in hero balance)
+      const baseCenterX = width * 0.74;
+      const baseCenterY = height * 0.42;
+
+      // Parallax water depth displacement from mouse
+      const parallaxX = (mouse.x - baseCenterX) * 0.12;
+      const parallaxY = (mouse.y - baseCenterY) * 0.12;
+      const originX = baseCenterX + parallaxX;
+      const originY = baseCenterY + parallaxY;
+
+      // Maximum expansion radius for outer ripples
+      const maxAvailableR = Math.min(width * 0.52, height * 0.62, 420);
+
+      // =========================================================================
+      // 1. MASTER WATER WAVE DYNAMICS ("Spreads from center and comes together")
+      // =========================================================================
+      // Continuous periodic cycle: ~8.0 seconds total period
+      // Smooth sinusoidal breathing phase:
+      // When cycleProgress is 0 -> 0.5: Waves smoothly spread outward from center
+      // When cycleProgress is 0.5 -> 1.0: Waves gracefully converge and come together
+      const CYCLE_PERIOD = 8.0;
+      const cycleProgress = (timeSec % CYCLE_PERIOD) / CYCLE_PERIOD;
+      
+      // Tidal breathing factor using smooth cosine: 0 (contracted / gathered at core) to 1 (fully spread outward)
+      const tidalPhase = 0.5 - 0.5 * Math.cos(cycleProgress * Math.PI * 2);
+
+      // Core bloom / droplet splash intensity (brightest when waves converge together and start spreading anew)
+      const convergencePeak = Math.pow(1 - tidalPhase, 2.5); // Spikes as waves come together
+      const expansionPeak = Math.pow(tidalPhase, 1.8);
+
+      // =========================================================================
+      // 2. AMBIENT WATER PARTICLES (Dew droplets floating in the fluid field)
+      // =========================================================================
+      particles.forEach((p) => {
+        // Natural fluid motion with harmonic wave bobbing
+        p.x += p.vx + Math.sin(timeSec * 1.2 + p.phase) * 0.25;
+        p.y += p.vy + Math.cos(timeSec * 0.9 + p.phase) * 0.25;
+
+        // Wrap around bounds
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        // Soft fluid repulsion from mouse
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 130 && dist > 1) {
+          const force = (1 - dist / 130) * 1.5;
+          p.x += (dx / dist) * force;
+          p.y += (dy / dist) * force;
+        }
+
+        // Draw glowing particle
+        ctx.beginPath();
+        const pulseR = p.baseRadius * (1 + 0.3 * Math.sin(timeSec * 2 + p.phase));
+        ctx.arc(p.x, p.y, pulseR, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 6;
+        ctx.globalAlpha = p.alpha * (0.6 + 0.4 * Math.sin(timeSec * 1.5 + p.phase));
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      ctx.globalAlpha = 1.0;
+
+      // =========================================================================
+      // 3. RADIAL LIQUID AURA & REFRACTION BACKDROP
+      // =========================================================================
+      const currentAuraR = maxAvailableR * (0.35 + 0.65 * tidalPhase) * 1.2;
+      const auraGrad = ctx.createRadialGradient(originX, originY, 4, originX, originY, currentAuraR);
+      auraGrad.addColorStop(0, `rgba(0, 240, 255, ${0.12 + 0.15 * convergencePeak})`);
+      auraGrad.addColorStop(0.25, `rgba(30, 154, 168, ${0.08 + 0.08 * tidalPhase})`);
+      auraGrad.addColorStop(0.55, `rgba(108, 92, 231, ${0.05 + 0.05 * tidalPhase})`);
+      auraGrad.addColorStop(0.85, `rgba(194, 64, 142, ${0.02 * tidalPhase})`);
+      auraGrad.addColorStop(1, 'rgba(20, 33, 61, 0)');
+
+      ctx.beginPath();
+      ctx.arc(originX, originY, currentAuraR, 0, Math.PI * 2);
+      ctx.fillStyle = auraGrad;
+      ctx.fill();
+
+      // =========================================================================
+      // 4. WATER WAVE CAUSTIC STREAMLINES (Connecting Fluid Light Rays)
+      // =========================================================================
+      // 16 smooth undulating liquid caustics that curve naturally like sunlight
+      // shining through undulating water waves onto the seabed
+      const CAUSTIC_RAYS = 16;
+      ctx.save();
+      for (let k = 0; k < CAUSTIC_RAYS; k++) {
+        const baseAngle = (k / CAUSTIC_RAYS) * Math.PI * 2;
+        ctx.beginPath();
+
+        const innerR = 18 + 12 * convergencePeak;
+        const outerR = maxAvailableR * (0.28 + 0.72 * tidalPhase);
+
+        // Start near core
+        const startX = originX + Math.cos(baseAngle) * innerR;
+        const startY = originY + Math.sin(baseAngle) * innerR;
+        ctx.moveTo(startX, startY);
+
+        // Multi-point fluid wave curve
+        const segments = 4;
+        for (let seg = 1; seg <= segments; seg++) {
+          const segFrac = seg / segments;
+          const r = innerR + (outerR - innerR) * segFrac;
+          // Fluid undulation along angle
+          const angleWiggle = Math.sin(timeSec * 1.5 + segFrac * 4 + k) * 0.08 * (1 - segFrac * 0.3);
+          const currentAngle = baseAngle + angleWiggle;
+          const px = originX + Math.cos(currentAngle) * r;
+          const py = originY + Math.sin(currentAngle) * r;
+          ctx.lineTo(px, py);
+        }
+
+        const rayAlpha = (0.06 + 0.09 * tidalPhase) * (1 - (k % 2 === 0 ? 0 : 0.35));
+        ctx.strokeStyle = k % 2 === 0 ? `rgba(0, 240, 255, ${rayAlpha * 1.2})` : `rgba(108, 92, 231, ${rayAlpha})`;
+        ctx.lineWidth = 0.85;
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // =========================================================================
+      // 5. CONCENTRIC WATER WAVE CRESTS ("Spreading out & coming together")
+      // =========================================================================
+      const waveVertices: { x: number; y: number; alpha: number; color: string }[][] = [];
+
+      for (let rIdx = 0; rIdx < WAVE_RING_COUNT; rIdx++) {
+        const palette = WAVE_PALETTES[rIdx % WAVE_PALETTES.length];
+        const ringFraction = (rIdx + 1) / WAVE_RING_COUNT;
+
+        // Radial computation:
+        // Staggered propagation creates the outward cascading water ripple wavefront!
+        const ringDelay = (rIdx / (WAVE_RING_COUNT - 1)) * 0.22;
+        
+        // Effective spreading factor for this wave crest:
+        const waveSpreadFactor = Math.max(
+          0.06,
+          Math.min(1.0, tidalPhase * (1 + ringDelay * 0.4) - ringDelay * (1 - tidalPhase) * 0.35)
+        );
+
+        // Dynamic radius combining tidal breath and continuous outward propagation
+        const baseRadius = maxAvailableR * ringFraction * waveSpreadFactor;
+        
+        // Continuous harmonic ripple wave displacement
+        const ripplePhaseOffset = (timeSec * 2.2 - rIdx * 0.6) % (Math.PI * 2);
+        const harmonicRipple = Math.sin(ripplePhaseOffset) * 4.5 * (1 - ringFraction * 0.3);
+        const finalBaseR = Math.max(8, baseRadius + harmonicRipple);
+
+        // Individual ring parallax tilt
+        const ringPx = originX + (mouse.x - baseCenterX) * 0.025 * (rIdx + 1);
+        const ringPy = originY + (mouse.y - baseCenterY) * 0.025 * (rIdx + 1);
+
+        // Build smooth undulating liquid perimeter
+        ctx.save();
+        ctx.beginPath();
+
+        const currentRingVertices: { x: number; y: number; alpha: number; color: string }[] = [];
+
+        for (let v = 0; v <= VERTEX_COUNT; v++) {
+          const angle = (v / VERTEX_COUNT) * Math.PI * 2;
+
+          // Organic water surface harmonics (fluid capillary waves)
+          const harmonic1 = Math.sin(angle * 3 + timeSec * 1.8 + rIdx) * 0.028;
+          const harmonic2 = Math.cos(angle * 5 - timeSec * 1.2 + rIdx * 0.5) * 0.016;
+          const harmonic3 = Math.sin(angle * 2 + timeSec * 2.4 - rIdx) * 0.014;
+          const organicFactor = 1 + (harmonic1 + harmonic2 + harmonic3) * (0.4 + 0.6 * tidalPhase);
+
+          // Local mouse wake distortion (water ripples smoothly around the cursor)
+          const testX = ringPx + Math.cos(angle) * finalBaseR * organicFactor;
+          const testY = ringPy + Math.sin(angle) * finalBaseR * organicFactor;
+          const distToMouse = Math.hypot(testX - mouse.x, testY - mouse.y);
+          let mouseDistortion = 0;
+          if (distToMouse < 140) {
+            const push = 1 - distToMouse / 140;
+            mouseDistortion = Math.sin(push * Math.PI) * 14;
+          }
+
+          const vertexR = finalBaseR * organicFactor + mouseDistortion;
+          const vx = ringPx + Math.cos(angle) * vertexR;
+          const vy = ringPy + Math.sin(angle) * vertexR;
+
+          if (v === 0) {
+            ctx.moveTo(vx, vy);
+          } else {
+            ctx.lineTo(vx, vy);
+          }
+
+          if (v < VERTEX_COUNT) {
+            currentRingVertices.push({
+              x: vx,
+              y: vy,
+              alpha: Math.min(1.0, 0.4 + 0.6 * tidalPhase),
+              color: palette.stroke,
+            });
+          }
+        }
+        ctx.closePath();
+
+        waveVertices.push(currentRingVertices);
+
+        // Dynamic wave visibility:
+        // When coming together, inner rings intensify; when spreading out, outer rings glow
+        const ringAlpha = Math.min(
+          0.85,
+          Math.max(
+            0.15,
+            (0.25 + (1 - ringFraction) * 0.45 * convergencePeak + ringFraction * 0.4 * expansionPeak) *
+              (0.7 + 0.3 * Math.sin(timeSec * 2.5 + rIdx))
+          )
+        );
+
+        // Pass 1: Soft diffuse liquid caustic glow under-stroke
+        ctx.shadowColor = palette.glow;
+        ctx.shadowBlur = 12 + 6 * Math.sin(timeSec * 2 + rIdx);
+        ctx.strokeStyle = palette.glow;
+        ctx.lineWidth = 2.4 + (rIdx === 0 ? 0.8 : 0);
+        ctx.globalAlpha = ringAlpha * 0.75;
+        ctx.stroke();
+
+        // Pass 2: Crisp water wave crest highlight line
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = rIdx === 0 || rIdx === WAVE_RING_COUNT - 1 ? '#FFFFFF' : palette.stroke;
+        ctx.lineWidth = 1.2 + (rIdx === 0 ? 0.6 : 0);
+        ctx.globalAlpha = ringAlpha;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // 6. GLISTENING WATER NODES & CAUSTIC DROPLETS
+      // =========================================================================
+      ctx.save();
+      waveVertices.forEach((ringNodes, r) => {
+        const step = r < 3 ? 4 : 6;
+        for (let i = 0; i < ringNodes.length; i += step) {
+          const node = ringNodes[i];
+          const shimmer = Math.sin(timeSec * 3 + r * 1.5 + i) * 0.5 + 0.5;
+          const nodeR = (1.4 + shimmer * 1.6) * (0.6 + 0.5 * tidalPhase);
+
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, nodeR, 0, Math.PI * 2);
+          ctx.fillStyle = shimmer > 0.6 ? '#FFFFFF' : node.color;
+          ctx.shadowColor = node.color;
+          ctx.shadowBlur = shimmer > 0.6 ? 8 : 4;
+          ctx.globalAlpha = (0.4 + shimmer * 0.5) * node.alpha;
+          ctx.fill();
+        }
+      });
+      ctx.restore();
+
+      // =========================================================================
+      // 7. USER CLICK RIPPLES (Interactive Pebble Waves)
+      // =========================================================================
+      for (let i = clickRipples.length - 1; i >= 0; i--) {
+        const rip = clickRipples[i];
+        rip.radius += rip.speed;
+        rip.alpha *= 0.965; // Exponential fade
+
+        if (rip.alpha < 0.02 || rip.radius > rip.maxRadius) {
+          clickRipples.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = rip.color;
+        ctx.shadowColor = rip.color;
+        ctx.shadowBlur = 10;
+        ctx.lineWidth = 1.6 * rip.alpha;
+        ctx.globalAlpha = rip.alpha;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // =========================================================================
+      // 8. CENTRAL WATER DROPLET & MENISCUS CORE (The Wave Epicenter)
+      // =========================================================================
+      ctx.save();
+
+      // Droplet radial pulse
+      const dropPulse = 1 + 0.25 * Math.sin(timeSec * 3) + 0.35 * convergencePeak;
+      const coreR = Math.max(14, 22 * dropPulse);
+
+      // Droplet impact water ring
+      const impactRingR = coreR * (1.6 + 0.4 * Math.sin(timeSec * 4));
+      ctx.beginPath();
+      ctx.arc(originX, originY, impactRingR, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0, 240, 255, ${0.4 + 0.45 * convergencePeak})`;
+      ctx.lineWidth = 1.4;
+      ctx.shadowColor = '#00F0FF';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+
+      // Radiant droplet glow
+      const dropGrad = ctx.createRadialGradient(originX, originY, 2, originX, originY, coreR * 2.2);
+      dropGrad.addColorStop(0, `rgba(255, 255, 255, ${0.95 * (0.7 + 0.3 * convergencePeak)})`);
+      dropGrad.addColorStop(0.3, `rgba(0, 240, 255, ${0.85 * (0.6 + 0.4 * convergencePeak)})`);
+      dropGrad.addColorStop(0.65, `rgba(30, 154, 168, ${0.55 * (0.6 + 0.4 * convergencePeak)})`);
+      dropGrad.addColorStop(1, 'rgba(20, 33, 61, 0)');
+
+      ctx.beginPath();
+      ctx.arc(originX, originY, coreR * 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = dropGrad;
+      ctx.fill();
+
+      // Inner liquid meniscus
+      ctx.beginPath();
+      ctx.arc(originX, originY, coreR * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = '#0B192C'; // Deep dark water center
+      ctx.fill();
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 1.8;
+      ctx.shadowColor = '#00F0FF';
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+
+      // Prismatic pinpoint droplet highlight
+      const highlightX = originX - coreR * 0.18;
+      const highlightY = originY - coreR * 0.18;
+      ctx.beginPath();
+      ctx.arc(highlightX, highlightY, Math.max(1.5, coreR * 0.12), 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = '#FFFFFF';
+      ctx.fill();
+
+      ctx.restore();
+
+      // Next frame
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    animationFrameId = requestAnimationFrame(render);
+
+    // Cleanup
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+      container.removeEventListener('mousemove', handleMouseMove);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`optical-net-canvas-container ${className}`}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        pointerEvents: 'auto',
+        cursor: 'crosshair',
+        zIndex: 1,
+        ...style,
+      }}
+      title="Interactive Fluid Water Waves — Watch waves smoothly spread and converge"
+    >
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
+          width: '100%',
+          height: '100%',
+        }}
+      />
+    </div>
+  );
+};
+
+export default OpticalNetCanvas;

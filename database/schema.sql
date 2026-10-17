@@ -45,6 +45,27 @@ CREATE TABLE `customers` (
   INDEX `idx_customers_name` (`full_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 2B. Customer Profile History table (Demographic evolution & audit trail)
+DROP TABLE IF EXISTS `customer_profile_history`;
+CREATE TABLE `customer_profile_history` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `customer_id` INT NOT NULL,
+  `changed_by_user_id` INT NULL,
+  `changed_by_name` VARCHAR(100) NULL,
+  `previous_full_name` VARCHAR(100) NULL,
+  `previous_phone_number` VARCHAR(20) NULL,
+  `previous_email` VARCHAR(100) NULL,
+  `previous_address` TEXT NULL,
+  `previous_age` INT NULL,
+  `previous_gender` ENUM('MALE', 'FEMALE', 'OTHER') NULL,
+  `previous_occupation` VARCHAR(100) NULL,
+  `previous_preferences_notes` TEXT NULL,
+  `change_reason` VARCHAR(255) DEFAULT 'Returning patient profile update',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`customer_id`) REFERENCES `customers`(`id`) ON DELETE CASCADE,
+  INDEX `idx_hist_customer` (`customer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 3. Eye Examinations table
 DROP TABLE IF EXISTS `examinations`;
 CREATE TABLE `examinations` (
@@ -92,6 +113,10 @@ CREATE TABLE `suppliers` (
   `email` VARCHAR(100) NULL,
   `address` TEXT NULL,
   `is_active` BOOLEAN DEFAULT TRUE NOT NULL,
+  `credit_terms` VARCHAR(100) DEFAULT 'Net 30 Days credit settlement from date of physical Goods Receipt at Nintavur',
+  `settlement_method` VARCHAR(100) DEFAULT 'Direct Electronic Bank Transfer (Commercial Bank / HNB Sri Lanka)',
+  `lead_time` VARCHAR(100) DEFAULT '2 to 3 Business Days via standard courier delivery to Indian Optician',
+  `warranty_terms` VARCHAR(255) DEFAULT '12 months frame hinge warranty; 6 months hard multi-coating guarantee on lenses',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

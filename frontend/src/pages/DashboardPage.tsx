@@ -17,7 +17,9 @@ import {
   Stethoscope,
   Send,
   Eye,
-  CheckCircle2
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -458,18 +460,40 @@ export const DashboardPage: React.FC<DashboardProps> = ({ onNavigate }) => {
                       className="btn g sm"
                       disabled={decisionsPage === 1}
                       onClick={() => setDecisionsPage((p) => Math.max(1, p - 1))}
-                      style={{ padding: '4px 10px', fontSize: 12 }}
+                      style={{
+                        padding: '5px 12px',
+                        fontSize: 12,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        cursor: decisionsPage === 1 ? 'not-allowed' : 'pointer',
+                        opacity: decisionsPage === 1 ? 0.45 : 1,
+                        transition: 'all 0.15s ease',
+                      }}
+                      title="Previous Page"
                     >
-                      Previous
+                      <ChevronLeft size={14} />
+                      <span>Previous</span>
                     </button>
                     <button
                       type="button"
                       className="btn g sm"
                       disabled={decisionsPage >= totalDecisionPages}
                       onClick={() => setDecisionsPage((p) => Math.min(totalDecisionPages, p + 1))}
-                      style={{ padding: '4px 10px', fontSize: 12 }}
+                      style={{
+                        padding: '5px 12px',
+                        fontSize: 12,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        cursor: decisionsPage >= totalDecisionPages ? 'not-allowed' : 'pointer',
+                        opacity: decisionsPage >= totalDecisionPages ? 0.45 : 1,
+                        transition: 'all 0.15s ease',
+                      }}
+                      title="Next Page"
                     >
-                      Next
+                      <span>Next</span>
+                      <ChevronRight size={14} />
                     </button>
                   </div>
                 </div>
