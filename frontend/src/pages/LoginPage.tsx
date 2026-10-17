@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { BlobButton } from '../components/Common/BlobButton';
 import { OpticalNetCanvas } from '../components/Common/OpticalNetCanvas';
 import api from '../services/api';
@@ -10,8 +9,6 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  Sun,
-  Moon,
   Check,
   Shield,
   KeyRound,
@@ -26,7 +23,6 @@ import {
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
-  const { theme, toggleTheme } = useTheme();
 
   // Authentication Form State
   const [username, setUsername] = useState('optometrist');
@@ -386,22 +382,6 @@ export const LoginPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Theme Switcher Footer */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingTop: 12,
-              borderTop: '1px solid var(--border-subtle)',
-            }}
-          >
-            <span className="sub" style={{ fontSize: 12.5 }}>Interface Theme</span>
-            <div className="thm" onClick={toggleTheme} title="Toggle between Light and Dark mode">
-              <span className={theme === 'light' ? 'on' : ''}><Sun size={16} /></span>
-              <span className={theme === 'dark' ? 'on' : ''}><Moon size={16} /></span>
-            </div>
-          </div>
         </div>
       </div>
 

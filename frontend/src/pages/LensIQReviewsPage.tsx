@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
 import { StatusBadge } from '../components/Common/StatusBadge';
 import { Sparkles, Check, X, ShieldAlert, ArrowRight, User } from 'lucide-react';
 
@@ -221,8 +220,6 @@ interface LensIQReviewsPageProps {
 }
 
 export const LensIQReviewsPage: React.FC<LensIQReviewsPageProps> = ({ onApplyToSale }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const [reviews, setReviews] = useState<ReviewQueueItem[]>(() => {
     try {
       const stored = localStorage.getItem('optopick_lens_reviews');
@@ -460,22 +457,22 @@ export const LensIQReviewsPage: React.FC<LensIQReviewsPageProps> = ({ onApplyToS
                     display: 'flex',
                     borderRadius: 16,
                     overflow: 'hidden',
-                    border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
-                    boxShadow: isDark ? '0 2px 8px rgba(0, 0, 0, 0.25)' : '0 1px 3px rgba(0, 0, 0, 0.03)',
+                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
                   }}
                 >
                   {/* Left Column: Historical Prescription (Before) */}
                   <div
                     style={{
                       flex: 1,
-                      background: isDark ? 'rgba(153, 27, 27, 0.16)' : '#FFF0ED',
+                      background: '#FFF0ED',
                       padding: '16px 24px 18px',
-                      borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.04)',
+                      borderRight: '1px solid rgba(0, 0, 0, 0.04)',
                     }}
                   >
                     <div
                       style={{
-                        color: isDark ? '#FCA5A5' : '#A32B2B',
+                        color: '#A32B2B',
                         fontSize: 13.5,
                         fontWeight: 700,
                         marginBottom: 12,
@@ -488,22 +485,22 @@ export const LensIQReviewsPage: React.FC<LensIQReviewsPageProps> = ({ onApplyToS
                       <thead>
                         <tr
                           style={{
-                            borderBottom: isDark ? '1px solid rgba(248, 113, 113, 0.2)' : '1px solid rgba(220, 38, 38, 0.12)',
+                            borderBottom: '1px solid rgba(220, 38, 38, 0.12)',
                           }}
                         >
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px 0', textAlign: 'left', width: '18%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px 0', textAlign: 'left', width: '18%' }}>
                             Eye
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '24%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '24%' }}>
                             SPH
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
                             CYL
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '18%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '18%' }}>
                             AXIS
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
                             ADD
                           </th>
                         </tr>
@@ -511,39 +508,39 @@ export const LensIQReviewsPage: React.FC<LensIQReviewsPageProps> = ({ onApplyToS
                       <tbody>
                         <tr
                           style={{
-                            borderBottom: isDark ? '1px solid rgba(248, 113, 113, 0.15)' : '1px solid rgba(220, 38, 38, 0.10)',
+                            borderBottom: '1px solid rgba(220, 38, 38, 0.10)',
                           }}
                         >
-                          <td style={{ fontSize: 14, fontWeight: 700, color: isDark ? '#F1F5F9' : '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
+                          <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
                             RE
                           </td>
-                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(prior.od_sph)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(prior.od_cyl)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {prior.od_axis}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? 'rgba(255, 255, 255, 0.45)' : '#64748B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#64748B', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(prior.od_add)}
                           </td>
                         </tr>
                         <tr>
-                          <td style={{ fontSize: 14, fontWeight: 700, color: isDark ? '#F1F5F9' : '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
+                          <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
                             LE
                           </td>
-                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(prior.os_sph)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(prior.os_cyl)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {prior.os_axis}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? 'rgba(255, 255, 255, 0.45)' : '#64748B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#64748B', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(prior.os_add)}
                           </td>
                         </tr>
@@ -555,13 +552,13 @@ export const LensIQReviewsPage: React.FC<LensIQReviewsPageProps> = ({ onApplyToS
                   <div
                     style={{
                       flex: 1,
-                      background: isDark ? 'rgba(6, 95, 70, 0.18)' : '#EEF7F2',
+                      background: '#EEF7F2',
                       padding: '16px 24px 18px',
                     }}
                   >
                     <div
                       style={{
-                        color: isDark ? '#86EFAC' : '#15803D',
+                        color: '#15803D',
                         fontSize: 13.5,
                         fontWeight: 700,
                         marginBottom: 12,
@@ -573,55 +570,55 @@ export const LensIQReviewsPage: React.FC<LensIQReviewsPageProps> = ({ onApplyToS
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px 0', textAlign: 'left', width: '18%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px 0', textAlign: 'left', width: '18%' }}>
                             Eye
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '24%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '24%' }}>
                             SPH
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
                             CYL
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '18%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '18%' }}>
                             AXIS
                           </th>
-                          <th style={{ fontSize: 12.5, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255, 0.6)' : '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
+                          <th style={{ fontSize: 12.5, fontWeight: 700, color: '#5E6D82', padding: '0 4px 8px', textAlign: 'center', width: '20%' }}>
                             ADD
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td style={{ fontSize: 14, fontWeight: 700, color: isDark ? '#F1F5F9' : '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
+                          <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
                             RE
                           </td>
-                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(nowRe.sph)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(nowRe.cyl)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {nowRe.axis}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
                             {nowRe.add}
                           </td>
                         </tr>
                         <tr>
-                          <td style={{ fontSize: 14, fontWeight: 700, color: isDark ? '#F1F5F9' : '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
+                          <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', padding: '10px 4px 10px 0', textAlign: 'left' }}>
                             LE
                           </td>
-                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: isDark ? '#FFFFFF' : '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.02em', color: '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(nowLe.sph)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {formatVal(nowLe.cyl)}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 500, color: isDark ? '#CBD5E1' : '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 500, color: '#1E293B', padding: '10px 4px', textAlign: 'center' }}>
                             {nowLe.axis}
                           </td>
-                          <td style={{ fontSize: 14, fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
+                          <td style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', padding: '10px 4px', textAlign: 'center' }}>
                             {nowLe.add}
                           </td>
                         </tr>

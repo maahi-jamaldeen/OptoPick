@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
 import { StatusBadge } from '../components/Common/StatusBadge';
 import {
   Info,
@@ -25,8 +24,6 @@ import {
 } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'business' | 'rules' | 'stock' | 'ai' | 'security'>('rules');
 
   // Form State
@@ -180,11 +177,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #172554 0%, #1D4ED8 100%)'
-                    : 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
-                  border: isDark ? '1px solid rgba(147, 197, 253, 0.4)' : '1px solid rgba(37, 99, 235, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(30, 58, 138, 0.15)',
+                  background: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
+                  border: '1px solid rgba(37, 99, 235, 0.35)',
+                  boxShadow: '0 4px 14px rgba(30, 58, 138, 0.15)',
                 }}
               >
                 <div
@@ -265,11 +260,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #78350F 0%, #B45309 100%)'
-                    : 'linear-gradient(135deg, #92400E 0%, #D97706 100%)',
-                  border: isDark ? '1px solid rgba(253, 230, 138, 0.4)' : '1px solid rgba(217, 119, 6, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(180, 83, 9, 0.15)',
+                  background: 'linear-gradient(135deg, #92400E 0%, #D97706 100%)',
+                  border: '1px solid rgba(217, 119, 6, 0.35)',
+                  boxShadow: '0 4px 14px rgba(180, 83, 9, 0.15)',
                 }}
               >
                 <div
@@ -350,11 +343,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #064E3B 0%, #047857 100%)'
-                    : 'linear-gradient(135deg, #065F46 0%, #059669 100%)',
-                  border: isDark ? '1px solid rgba(167, 243, 208, 0.4)' : '1px solid rgba(5, 150, 105, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(5, 150, 105, 0.15)',
+                  background: 'linear-gradient(135deg, #065F46 0%, #059669 100%)',
+                  border: '1px solid rgba(5, 150, 105, 0.35)',
+                  boxShadow: '0 4px 14px rgba(5, 150, 105, 0.15)',
                 }}
               >
                 <div
@@ -446,11 +437,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #4C1D95 0%, #6D28D9 100%)'
-                    : 'linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%)',
-                  border: isDark ? '1px solid rgba(216, 180, 254, 0.4)' : '1px solid rgba(124, 58, 237, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(109, 40, 217, 0.15)',
+                  background: 'linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%)',
+                  border: '1px solid rgba(124, 58, 237, 0.35)',
+                  boxShadow: '0 4px 14px rgba(109, 40, 217, 0.15)',
                 }}
               >
                 <div
@@ -530,11 +519,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #134E4A 0%, #0F766E 100%)'
-                    : 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)',
-                  border: isDark ? '1px solid rgba(153, 246, 228, 0.4)' : '1px solid rgba(13, 148, 136, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(15, 118, 110, 0.15)',
+                  background: 'linear-gradient(135deg, #0F766E 0%, #0D9488 100%)',
+                  border: '1px solid rgba(13, 148, 136, 0.35)',
+                  boxShadow: '0 4px 14px rgba(15, 118, 110, 0.15)',
                 }}
               >
                 <div
@@ -656,9 +643,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 16,
                   padding: '16px 20px',
                   borderRadius: 14,
-                  background: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F8FAFC',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-                  boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.03)',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -667,9 +654,9 @@ export const SettingsPage: React.FC = () => {
                     width: 42,
                     height: 42,
                     borderRadius: 10,
-                    background: isDark ? 'rgba(99, 102, 241, 0.16)' : '#EEF2FF',
-                    color: isDark ? '#A5B4FC' : '#4F46E5',
-                    border: isDark ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid #C7D2FE',
+                    background: '#EEF2FF',
+                    color: '#4F46E5',
+                    border: '1px solid #C7D2FE',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -701,9 +688,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 16,
                   padding: '16px 20px',
                   borderRadius: 14,
-                  background: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F8FAFC',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-                  boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.03)',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -712,9 +699,9 @@ export const SettingsPage: React.FC = () => {
                     width: 42,
                     height: 42,
                     borderRadius: 10,
-                    background: isDark ? 'rgba(14, 165, 233, 0.16)' : '#F0F9FF',
-                    color: isDark ? '#38BDF8' : '#0284C7',
-                    border: isDark ? '1px solid rgba(14, 165, 233, 0.3)' : '1px solid #BAE6FD',
+                    background: '#F0F9FF',
+                    color: '#0284C7',
+                    border: '1px solid #BAE6FD',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -746,9 +733,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 16,
                   padding: '16px 20px',
                   borderRadius: 14,
-                  background: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F8FAFC',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-                  boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.03)',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -757,9 +744,9 @@ export const SettingsPage: React.FC = () => {
                     width: 42,
                     height: 42,
                     borderRadius: 10,
-                    background: isDark ? 'rgba(244, 63, 94, 0.16)' : '#FFF1F2',
-                    color: isDark ? '#FB7185' : '#E11D48',
-                    border: isDark ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid #FECDD3',
+                    background: '#FFF1F2',
+                    color: '#E11D48',
+                    border: '1px solid #FECDD3',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -791,9 +778,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 16,
                   padding: '16px 20px',
                   borderRadius: 14,
-                  background: isDark ? 'rgba(255, 255, 255, 0.03)' : '#F8FAFC',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
-                  boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.03)',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
                   transition: 'all 0.15s ease',
                 }}
               >
@@ -802,9 +789,9 @@ export const SettingsPage: React.FC = () => {
                     width: 42,
                     height: 42,
                     borderRadius: 10,
-                    background: isDark ? 'rgba(16, 185, 129, 0.16)' : '#ECFDF5',
-                    color: isDark ? '#34D399' : '#059669',
-                    border: isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid #A7F3D0',
+                    background: '#ECFDF5',
+                    color: '#059669',
+                    border: '1px solid #A7F3D0',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -826,9 +813,9 @@ export const SettingsPage: React.FC = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 6,
-                    background: isDark ? 'rgba(16, 185, 129, 0.15)' : '#ECFDF5',
-                    color: isDark ? '#6EE7B7' : '#047857',
-                    border: isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid #A7F3D0',
+                    background: '#ECFDF5',
+                    color: '#047857',
+                    border: '1px solid #A7F3D0',
                     padding: '4px 12px',
                     borderRadius: 9999,
                     fontSize: 12,
@@ -867,11 +854,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #172554 0%, #1D4ED8 100%)'
-                    : 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
-                  border: isDark ? '1px solid rgba(147, 197, 253, 0.4)' : '1px solid rgba(37, 99, 235, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(30, 58, 138, 0.15)',
+                  background: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)',
+                  border: '1px solid rgba(37, 99, 235, 0.35)',
+                  boxShadow: '0 4px 14px rgba(30, 58, 138, 0.15)',
                 }}
               >
                 <div
@@ -923,11 +908,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #064E3B 0%, #047857 100%)'
-                    : 'linear-gradient(135deg, #065F46 0%, #059669 100%)',
-                  border: isDark ? '1px solid rgba(167, 243, 208, 0.4)' : '1px solid rgba(5, 150, 105, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(5, 150, 105, 0.15)',
+                  background: 'linear-gradient(135deg, #065F46 0%, #059669 100%)',
+                  border: '1px solid rgba(5, 150, 105, 0.35)',
+                  boxShadow: '0 4px 14px rgba(5, 150, 105, 0.15)',
                 }}
               >
                 <div
@@ -979,11 +962,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #78350F 0%, #B45309 100%)'
-                    : 'linear-gradient(135deg, #92400E 0%, #D97706 100%)',
-                  border: isDark ? '1px solid rgba(253, 230, 138, 0.4)' : '1px solid rgba(217, 119, 6, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(180, 83, 9, 0.15)',
+                  background: 'linear-gradient(135deg, #92400E 0%, #D97706 100%)',
+                  border: '1px solid rgba(217, 119, 6, 0.35)',
+                  boxShadow: '0 4px 14px rgba(180, 83, 9, 0.15)',
                 }}
               >
                 <div
@@ -1035,11 +1016,9 @@ export const SettingsPage: React.FC = () => {
                   gap: 18,
                   padding: '18px 22px',
                   borderRadius: 16,
-                  background: isDark
-                    ? 'linear-gradient(135deg, #4C1D95 0%, #6D28D9 100%)'
-                    : 'linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%)',
-                  border: isDark ? '1px solid rgba(216, 180, 254, 0.4)' : '1px solid rgba(124, 58, 237, 0.35)',
-                  boxShadow: isDark ? '0 4px 16px rgba(0, 0, 0, 0.28)' : '0 4px 14px rgba(109, 40, 217, 0.15)',
+                  background: 'linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%)',
+                  border: '1px solid rgba(124, 58, 237, 0.35)',
+                  boxShadow: '0 4px 14px rgba(109, 40, 217, 0.15)',
                 }}
               >
                 <div

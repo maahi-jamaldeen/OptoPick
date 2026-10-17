@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Sun, Moon, Plus, ShoppingCart, UserPlus, Stethoscope } from 'lucide-react';
+import { Search, Plus, ShoppingCart, UserPlus, Stethoscope } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import { BlobButton } from '../Common/BlobButton';
 
 interface NavbarProps {
@@ -18,7 +17,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSearch,
 }) => {
   const { user, isAdmin } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const [searchVal, setSearchVal] = useState('');
 
   const todayStr = new Intl.DateTimeFormat('en-GB', {
@@ -61,21 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         />
       </div>
 
-      {/* Refraction Theme Switcher Pill */}
-      <div
-        className="thm"
-        onClick={toggleTheme}
-        title={`Current theme: ${theme}. Click to switch to ${theme === 'light' ? 'Dark Mode (Examination Room)' : 'Light Mode (Front Desk)'}`}
-        role="button"
-        tabIndex={0}
-      >
-        <span className={theme === 'light' ? 'on' : ''}>
-          <Sun size={17} />
-        </span>
-        <span className={theme === 'dark' ? 'on' : ''}>
-          <Moon size={17} />
-        </span>
-      </div>
 
       {/* Primary Action Button */}
       {onNavigate && (

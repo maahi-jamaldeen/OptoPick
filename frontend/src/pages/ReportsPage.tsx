@@ -7,11 +7,7 @@ import {
   FileSpreadsheet,
   FileText
 } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
-
 export const ReportsPage: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
 
   const [fromDate, setFromDate] = useState('2026-09-01');
   const [toDate, setToDate] = useState('2026-09-30');
@@ -338,9 +334,9 @@ export const ReportsPage: React.FC = () => {
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  background: isDark ? '#1E293B' : '#123B50',
+                  background: '#123B50',
                   color: '#FFFFFF',
-                  border: isDark ? '1.5px solid #334155' : '1.5px solid #0F2D3D',
+                  border: '1.5px solid #0F2D3D',
                   boxShadow: '0 2px 8px rgba(18, 59, 80, 0.2)',
                 }}
                 onMouseEnter={(e) => {
@@ -352,7 +348,7 @@ export const ReportsPage: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 2px 8px rgba(18, 59, 80, 0.2)';
                 }}
               >
-                <FileSpreadsheet size={15} color={isDark ? '#93C5FD' : '#7DD3FC'} />
+                <FileSpreadsheet size={15} color="#7DD3FC" />
                 <span>Export Excel</span>
               </button>
 
@@ -372,9 +368,9 @@ export const ReportsPage: React.FC = () => {
                   fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
-                  background: isDark ? '#1E293B' : '#123B50',
+                  background: '#123B50',
                   color: '#FFFFFF',
-                  border: isDark ? '1.5px solid #334155' : '1.5px solid #0F2D3D',
+                  border: '1.5px solid #0F2D3D',
                   boxShadow: '0 2px 8px rgba(18, 59, 80, 0.2)',
                 }}
                 onMouseEnter={(e) => {
@@ -386,7 +382,7 @@ export const ReportsPage: React.FC = () => {
                   e.currentTarget.style.boxShadow = '0 2px 8px rgba(18, 59, 80, 0.2)';
                 }}
               >
-                <FileText size={15} color={isDark ? '#93C5FD' : '#7DD3FC'} />
+                <FileText size={15} color="#7DD3FC" />
                 <span>Export PDF</span>
               </button>
             </div>

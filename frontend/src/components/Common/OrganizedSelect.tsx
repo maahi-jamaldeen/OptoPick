@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
+import { ChevronDown, Check, X } from 'lucide-react';
 
 export interface OrganizedSelectOption {
   value: number | string;
@@ -44,70 +43,57 @@ export const OrganizedSelect: React.FC<OrganizedSelectProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Safe theme detection
-  let isDark = false;
-  try {
-    const themeContext = useTheme();
-    isDark = themeContext?.theme === 'dark';
-  } catch {
-    isDark = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark';
-  }
-
-  // Theme-adaptive color palette for crystal-clear visibility
+  // Clear, crisp optical light palette
   const palette = {
     // Trigger box
-    triggerBg: disabled
-      ? (isDark ? '#141d27' : '#f8fafc')
-      : (isDark ? '#141d27' : '#ffffff'),
+    triggerBg: disabled ? '#f8fafc' : '#ffffff',
     triggerBorder: isOpen
-      ? 'orangered'
+      ? '#0284c7'
       : isHovered
-      ? (isDark ? '#5a718a' : '#94a3b8')
-      : (isDark ? '#3b4d61' : '#cbd5e1'),
+      ? '#94a3b8'
+      : '#cbd5e1',
     triggerShadow: isOpen
-      ? (isDark ? '0 0 0 3px rgba(255, 69, 0, 0.28)' : '0 0 0 3px rgba(255, 69, 0, 0.12)')
-      : (isDark ? '0 1px 3px rgba(0, 0, 0, 0.4)' : '0 1px 2px rgba(0, 0, 0, 0.02)'),
+      ? '0 0 0 3px rgba(2, 132, 199, 0.12)'
+      : '0 1px 2px rgba(0, 0, 0, 0.02)',
 
     // Trigger typography & icons
-    triggerPlaceholder: isDark ? '#94a3b8' : '#64748b',
-    triggerIcon: isDark ? '#94a3b8' : '#64748b',
-    triggerIconActive: isDark ? '#f8fafc' : '#0f172a',
-    triggerCode: isDark ? '#7dd3fc' : '#475569',
-    triggerLabel: isDark ? '#f8fafc' : '#0f172a',
-    triggerLabelNone: isDark ? '#94a3b8' : '#64748b',
-    triggerPrice: isDark ? '#ffffff' : '#0f172a',
-    triggerChevron: isDark ? '#94a3b8' : '#64748b',
+    triggerPlaceholder: '#64748b',
+    triggerIcon: '#64748b',
+    triggerIconActive: '#0f172a',
+    triggerCode: '#475569',
+    triggerLabel: '#0f172a',
+    triggerLabelNone: '#64748b',
+    triggerPrice: '#0f172a',
+    triggerChevron: '#64748b',
 
     // Floating dropdown menu
-    menuBg: isDark ? '#16202c' : '#ffffff',
-    menuBorder: isDark ? '#3b4d61' : '#cbd5e1',
-    menuShadow: isDark
-      ? '0 20px 45px -4px rgba(0, 0, 0, 0.8), 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.09)'
-      : '0 14px 30px -4px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05)',
-    menuDivider: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-    emptyText: isDark ? '#94a3b8' : '#64748b',
+    menuBg: '#ffffff',
+    menuBorder: '#cbd5e1',
+    menuShadow: '0 14px 30px -4px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05)',
+    menuDivider: 'rgba(0, 0, 0, 0.05)',
+    emptyText: '#64748b',
 
     // Rows
-    rowHoverBg: isDark ? 'rgba(255, 255, 255, 0.06)' : '#f8fafc',
-    rowSelectedBg: isDark ? 'rgba(255, 69, 0, 0.16)' : 'rgba(255, 69, 0, 0.05)',
-    accentBorder: 'orangered',
+    rowHoverBg: '#f8fafc',
+    rowSelectedBg: 'rgba(2, 132, 199, 0.06)',
+    accentBorder: '#0284c7',
 
     // Row typography
-    codeText: isDark ? '#7dd3fc' : '#475569',
-    titleText: isDark ? '#f8fafc' : '#0f172a',
-    titleTextSelected: isDark ? '#ffffff' : '#0f172a',
-    priceText: isDark ? '#ffffff' : '#0f172a',
-    subtitleText: isDark ? '#94a3b8' : '#64748b',
+    codeText: '#475569',
+    titleText: '#0f172a',
+    titleTextSelected: '#0f172a',
+    priceText: '#0f172a',
+    subtitleText: '#64748b',
 
     // Stock & status text
-    statusLowStock: isDark ? '#fbbf24' : '#d97706',
-    statusOutOfStock: isDark ? '#f87171' : '#dc2626',
-    statusInStock: isDark ? '#94a3b8' : '#64748b',
-    statusReady: isDark ? '#6ee7b7' : '#059669',
+    statusLowStock: '#d97706',
+    statusOutOfStock: '#dc2626',
+    statusInStock: '#64748b',
+    statusReady: '#059669',
 
     // Custom scrollbar
-    scrollbarThumb: isDark ? '#475569' : '#cbd5e1',
-    scrollbarThumbHover: isDark ? '#64748b' : '#94a3b8',
+    scrollbarThumb: '#cbd5e1',
+    scrollbarThumbHover: '#94a3b8',
   };
 
   const selectedOption = options.find((opt) => String(opt.value) === String(value));
@@ -295,8 +281,8 @@ export const OrganizedSelect: React.FC<OrganizedSelectProps> = ({
           )}
         </div>
 
-        {/* Right Action: Price tag if present & Chevron */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        {/* Right Action: Price tag if present, Clear button & Chevron */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           {selectedOption?.price !== undefined && selectedOption?.price !== null && selectedOption?.price !== '' && (
             <span
               style={{
@@ -308,6 +294,42 @@ export const OrganizedSelect: React.FC<OrganizedSelectProps> = ({
             >
               LKR {parseFloat(selectedOption.price as any).toLocaleString('en-US')}
             </span>
+          )}
+
+          {selectedOption && !disabled && !required && (
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange('');
+              }}
+              title="Clear selection"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                background: 'transparent',
+                border: 'none',
+                color: palette.triggerChevron,
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'color 0.15s ease, background 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#dc2626';
+                e.currentTarget.style.background = 'rgba(220, 38, 38, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = palette.triggerChevron;
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <X size={13} />
+            </button>
           )}
 
           <ChevronDown
@@ -397,7 +419,7 @@ export const OrganizedSelect: React.FC<OrganizedSelectProps> = ({
                           style={{
                             fontSize: 13,
                             fontWeight: isSelected ? 700 : 600,
-                            color: isSelected ? 'orangered' : palette.triggerLabelNone,
+                            color: isSelected ? '#0284c7' : palette.triggerLabelNone,
                           }}
                         >
                           {opt.label}
@@ -408,7 +430,7 @@ export const OrganizedSelect: React.FC<OrganizedSelectProps> = ({
                           </div>
                         )}
                       </div>
-                      {isSelected && <Check size={16} style={{ color: 'orangered', flexShrink: 0 }} />}
+                      {isSelected && <Check size={16} style={{ color: '#0284c7', flexShrink: 0 }} />}
                     </div>
                   );
                 }
@@ -482,7 +504,7 @@ export const OrganizedSelect: React.FC<OrganizedSelectProps> = ({
                             LKR {parseFloat(opt.price as any).toLocaleString('en-US')}
                           </span>
                         )}
-                        {isSelected && <Check size={16} style={{ color: 'orangered', flexShrink: 0 }} />}
+                        {isSelected && <Check size={16} style={{ color: '#0284c7', flexShrink: 0 }} />}
                       </div>
                     </div>
 

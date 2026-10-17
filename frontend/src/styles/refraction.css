@@ -1,11 +1,10 @@
 /* ==========================================================================
    OptoPick — "Refraction" Optical Precision Design System
-   Dual-Theme Engine: Light (Front-of-Shop) & Dark (Dimmed Refraction Room)
-   WCAG 2.1 AA Compliant in both themes
+   Clinical Light Precision Theme
+   WCAG 2.1 AA Compliant
    ========================================================================== */
 
-:root,
-:root[data-theme="light"] {
+:root {
   color-scheme: light;
 
   /* Surface & Canvas Tokens */
@@ -97,100 +96,6 @@
   --shadow-md: 0 4px 16px rgba(20, 33, 61, 0.08);
   --shadow-lg: 0 12px 32px rgba(20, 33, 61, 0.12);
   --shadow-focus: 0 0 0 3px #E9F1F7, 0 0 0 5px #2563B0;
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-
-  /* Surface & Canvas Tokens */
-  --bg-app: #0B1118;
-  --bg-glass: #151D27;
-  --surface-card: #1E2834;
-  --rail-bg: #0F161F;
-  --side-bg: #1E2834;
-  --portal-bg: #26323F;
-  --border-color: #34424F;
-  --border-subtle: #2B3744;
-  --input-border: #536477;
-  --input-bg: #1E2834;
-  --input-readonly: #26323F;
-
-  /* Typography & Ink Tokens */
-  --text-ink: #E9EEF3;
-  --text-sub: #A6B3C1;
-  --text-muted: #748392;
-
-  /* Primary Action (Warm Amber for Dark Theme) */
-  --primary-action: #F2A93B;
-  --primary-action-text: #1B1206;
-  --primary-action-hover: #FFAF3D;
-
-  /* Refraction AI Lens Violet & Prism */
-  --lens-violet: #B7AAFF;
-  --lens-violet-bg: #2B2748;
-  --lens-violet-text: #D5CDFF;
-  --prism-gradient: linear-gradient(90deg, #1E9AA8, #6C5CE7 55%, #C2408E);
-
-  /* Status Colors & High-Contrast Glowing Borders for Dark Mode */
-  --status-ok: #62D49C;
-  --status-ok-bg: #173328;
-  --status-ok-border: rgba(98, 212, 156, 0.45);
-  --status-warn: #FFC062;
-  --status-warn-bg: #382410;
-  --status-warn-border: rgba(255, 192, 98, 0.45);
-  --status-bad: #FF9B90;
-  --status-bad-bg: #3F1D21;
-  --status-bad-border: rgba(255, 155, 144, 0.45);
-  --status-info: #7DBEFF;
-  --status-info-bg: #1F3348;
-  --status-info-border: rgba(125, 190, 255, 0.45);
-
-  /* Legacy & Refraction --rf-* Tokens (Dark Mode: High Contrast Sky-Blue & Alert Accents) */
-  --rf-primary: #7DBEFF;
-  --rf-code-color: #7DBEFF;
-  --rf-card-bg: var(--surface-card);
-  --rf-glass-bg: var(--bg-glass);
-  --rf-border: var(--border-color);
-  --rf-text-muted: var(--text-muted);
-  --rf-text-sub: var(--text-sub);
-  --rf-text-ink: var(--text-ink);
-  --rf-badge-ok-text: #62D49C;
-  --rf-badge-ok-bg: #173328;
-  --rf-badge-warn-text: #FFC062;
-  --rf-badge-warn-bg: #382410;
-  --rf-badge-bad-text: #FF9B90;
-  --rf-badge-bad-bg: #3F1D21;
-  --rf-badge-info-text: #7DBEFF;
-  --rf-badge-info-bg: #1F3348;
-
-  /* Data Table Header Tokens (Dark Mode: Deep Twilight-Navy & Crisp Sky-Blue Accent) */
-  --table-th-bg: #141E2A;
-  --table-th-text: #7DBEFF;
-  --table-th-border: #2D3D4E;
-
-  /* Duochrome Refraction Tokens */
-  --duo-before-bg: #3D2326;
-  --duo-before-text: #FF9C90;
-  --duo-now-bg: #17342A;
-  --duo-now-text: #6FDCA5;
-
-  /* Rail Navigation */
-  --rail-icon-inactive: #6B7B8D;
-  --rail-icon-active: #1B1206;
-  --rail-active-bg: #F2A93B;
-  --side-active-bg: #3A3020;
-  --side-active-bar: #F2A93B;
-  --side-hover-bg: #2A3644;
-
-  /* Dial & Gauge */
-  --dial-track: #2B3744;
-  --dial-primary: #F2A93B;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
-  --shadow-focus: 0 0 0 3px #151D27, 0 0 0 5px #7DBEFF;
 }
 
 /* Base Styles & Typography */
@@ -634,34 +539,6 @@ h1, h2, h3, h4, h5, h6, .serif {
   background: var(--status-bad);
 }
 
-/* Theme Toggle Pill (.thm) */
-.thm {
-  display: flex;
-  border: 1px solid var(--border-color);
-  border-radius: 21px;
-  background: var(--surface-card);
-  padding: 3px;
-  gap: 3px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.thm span {
-  width: 34px;
-  height: 34px;
-  border-radius: 17px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-sub);
-  transition: all 0.2s ease;
-}
-
-.thm span.on {
-  background: var(--primary-action);
-  color: var(--primary-action-text);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
 
 /* Content Container */
 .content {
@@ -1229,15 +1106,6 @@ select.in, .sel {
   box-shadow: var(--shadow-sm);
 }
 
-:root[data-theme="dark"] .tab:not(.on) {
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  color: var(--text-sub);
-}
-
-:root[data-theme="dark"] .tab:not(.on):hover {
-  border-color: #ffffff;
-  color: var(--text-ink);
-}
 
 .chip {
   height: 34px;

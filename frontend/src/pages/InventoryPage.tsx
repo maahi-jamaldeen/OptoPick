@@ -5,7 +5,6 @@ import { StatusBadge } from '../components/Common/StatusBadge';
 import { StockInModal, PreselectedProduct } from './StockInModal';
 import { ProductRestockHistoryModal } from './ProductRestockHistoryModal';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import {
   Package,
   AlertTriangle,
@@ -26,26 +25,22 @@ import {
 
 export const InventoryPage: React.FC = () => {
   const { user, isAdmin } = useAuth();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
 
   // Helper for Main Navigation View Tabs (Current Stock Levels, Movement Audit History, Goods Receipt & Procurement Ledger)
   const getMainTabStyle = (isActive: boolean) => {
     if (isActive) {
       return {
-        background: isDark ? '#2563EB' : '#123B50',
+        background: '#123B50',
         color: '#ffffff',
-        border: isDark ? '1.5px solid #60A5FA' : '1.5px solid #123B50',
-        boxShadow: isDark
-          ? '0 0 16px rgba(37, 99, 235, 0.45)'
-          : '0 4px 14px rgba(18, 59, 80, 0.22)',
+        border: '1.5px solid #123B50',
+        boxShadow: '0 4px 14px rgba(18, 59, 80, 0.22)',
         fontWeight: 700,
       };
     }
     return {
       background: 'transparent',
       color: 'var(--text-sub)',
-      border: isDark ? '1.5px solid rgba(255, 255, 255, 0.35)' : '1.5px solid #ffffff',
+      border: '1.5px solid #ffffff',
       fontWeight: 600,
     };
   };
@@ -56,17 +51,17 @@ export const InventoryPage: React.FC = () => {
     if (filter === 'ALL') {
       if (isSelected) {
         return {
-          background: isDark ? '#334155' : '#123B50',
+          background: '#123B50',
           color: '#ffffff',
-          border: isDark ? '1.5px solid #64748B' : '1.5px solid #123B50',
-          boxShadow: isDark ? '0 0 12px rgba(100, 116, 139, 0.35)' : '0 2px 10px rgba(18, 59, 80, 0.2)',
+          border: '1.5px solid #123B50',
+          boxShadow: '0 2px 10px rgba(18, 59, 80, 0.2)',
           fontWeight: 700,
         };
       }
       return {
         background: 'transparent',
         color: 'var(--text-sub)',
-        border: isDark ? '1.5px solid rgba(255, 255, 255, 0.3)' : '1.5px solid #ffffff',
+        border: '1.5px solid #ffffff',
         fontWeight: 600,
       };
     }
@@ -74,17 +69,17 @@ export const InventoryPage: React.FC = () => {
     if (filter === 'LOW_STOCK') {
       if (isSelected) {
         return {
-          background: isDark ? '#B45309' : '#D97706',
+          background: '#D97706',
           color: '#ffffff',
-          border: isDark ? '1.5px solid #FBBF24' : '1.5px solid #B45309',
-          boxShadow: isDark ? '0 0 16px rgba(251, 191, 36, 0.45)' : '0 3px 12px rgba(217, 119, 6, 0.35)',
+          border: '1.5px solid #B45309',
+          boxShadow: '0 3px 12px rgba(217, 119, 6, 0.35)',
           fontWeight: 700,
         };
       }
       return {
         background: 'transparent',
-        color: isDark ? '#FBBF24' : '#D97706',
-        border: isDark ? '1.5px solid rgba(251, 191, 36, 0.4)' : '1.5px solid #ffffff',
+        color: '#D97706',
+        border: '1.5px solid #ffffff',
         fontWeight: 600,
       };
     }
@@ -92,17 +87,17 @@ export const InventoryPage: React.FC = () => {
     if (filter === 'OUT_OF_STOCK') {
       if (isSelected) {
         return {
-          background: isDark ? '#991B1B' : '#DC2626',
+          background: '#DC2626',
           color: '#ffffff',
-          border: isDark ? '1.5px solid #F87171' : '1.5px solid #991B1B',
-          boxShadow: isDark ? '0 0 16px rgba(248, 113, 113, 0.45)' : '0 3px 12px rgba(220, 38, 38, 0.35)',
+          border: '1.5px solid #991B1B',
+          boxShadow: '0 3px 12px rgba(220, 38, 38, 0.35)',
           fontWeight: 700,
         };
       }
       return {
         background: 'transparent',
-        color: isDark ? '#F87171' : '#DC2626',
-        border: isDark ? '1.5px solid rgba(248, 113, 113, 0.4)' : '1.5px solid #ffffff',
+        color: '#DC2626',
+        border: '1.5px solid #ffffff',
         fontWeight: 600,
       };
     }
@@ -113,9 +108,9 @@ export const InventoryPage: React.FC = () => {
     const isSelected = typeFilter === type;
     if (isSelected) {
       return {
-        background: isDark ? '#2563EB' : '#123B50',
+        background: '#123B50',
         color: '#ffffff',
-        border: isDark ? '1px solid #60A5FA' : '1px solid #123B50',
+        border: '1px solid #123B50',
         fontWeight: 700,
         padding: '4px 12px',
         fontSize: 12,
@@ -313,86 +308,86 @@ export const InventoryPage: React.FC = () => {
         <div className="op-rail-kpi card-green card-blue">
           <div className="op-rail-left">
             <div>
-              <div className="op-rail-header" style={{ color: isDark ? '#DAF1DE' : '#051F20' }}>
-                <Package size={18} color={isDark ? '#8EB69B' : '#0B2B26'} strokeWidth={2.2} />
+              <div className="op-rail-header" style={{ color: '#051F20' }}>
+                <Package size={18} color="#0B2B26" strokeWidth={2.2} />
                 <span>Total Tracked SKUs</span>
               </div>
-              <div className="op-rail-value" style={{ color: isDark ? '#DAF1DE' : '#051F20' }}>{totalCatalogCount}</div>
+              <div className="op-rail-value" style={{ color: '#051F20' }}>{totalCatalogCount}</div>
             </div>
-            <div className="op-rail-sub" style={{ color: isDark ? '#8EB69B' : '#0B2B26', fontWeight: 600 }}>Real-time inventory catalogue</div>
-            <div className="op-rail-footer" style={{ borderTopColor: isDark ? 'rgba(142, 182, 155, 0.2)' : 'rgba(11, 43, 38, 0.22)', color: isDark ? '#8EB69B' : '#051F20', fontWeight: 600 }}>
-              <span className="op-rail-dot" style={{ background: isDark ? '#8EB69B' : '#051F20', boxShadow: isDark ? 'none' : '0 0 0 2px rgba(35, 83, 71, 0.35)' }} />
+            <div className="op-rail-sub" style={{ color: '#0B2B26', fontWeight: 600 }}>Real-time inventory catalogue</div>
+            <div className="op-rail-footer" style={{ borderTopColor: 'rgba(11, 43, 38, 0.22)', color: '#051F20', fontWeight: 600 }}>
+              <span className="op-rail-dot" style={{ background: '#051F20', boxShadow: '0 0 0 2px rgba(35, 83, 71, 0.35)' }} />
               <span>All inventory</span>
             </div>
           </div>
           <div className="op-rail-right">
-            <span className="op-rail-pct" style={{ color: isDark ? '#DAF1DE' : '#051F20', fontWeight: 900 }}>100%</span>
-            <div className="op-rail-bar-track" style={{ background: isDark ? 'rgba(11, 43, 38, 0.8)' : 'rgba(11, 43, 38, 0.2)' }}>
+            <span className="op-rail-pct" style={{ color: '#051F20', fontWeight: 900 }}>100%</span>
+            <div className="op-rail-bar-track" style={{ background: 'rgba(11, 43, 38, 0.2)' }}>
               <div
                 className="op-rail-bar-fill"
                 style={{
                   height: '100%',
-                  background: isDark ? '#8EB69B' : 'linear-gradient(180deg, #235347 0%, #051F20 100%)',
+                  background: 'linear-gradient(180deg, #235347 0%, #051F20 100%)',
                 }}
               />
             </div>
           </div>
         </div>
 
-        {/* Card 2: Low Stock Warnings (Blue Swatch: #021024 -> #C1E8FF) */}
+        {/* Card 2: Low Stock Warnings (Blue Swatch) */}
         <div className="op-rail-kpi card-blue-palette card-amber">
           <div className="op-rail-left">
             <div>
-              <div className="op-rail-header" style={{ color: isDark ? '#C1E8FF' : '#021024' }}>
-                <AlertTriangle size={18} color={isDark ? '#7DA0CA' : '#052659'} strokeWidth={2.2} />
+              <div className="op-rail-header" style={{ color: '#021024' }}>
+                <AlertTriangle size={18} color="#052659" strokeWidth={2.2} />
                 <span>Low Stock Warnings</span>
               </div>
-              <div className="op-rail-value" style={{ color: isDark ? '#C1E8FF' : '#021024' }}>{lowStockCount}</div>
+              <div className="op-rail-value" style={{ color: '#021024' }}>{lowStockCount}</div>
             </div>
-            <div className="op-rail-sub" style={{ color: isDark ? '#7DA0CA' : '#052659', fontWeight: 600 }}>At or below reorder threshold</div>
-            <div className="op-rail-footer" style={{ borderTopColor: isDark ? 'rgba(125, 160, 202, 0.2)' : 'rgba(5, 38, 89, 0.22)', color: isDark ? '#7DA0CA' : '#021024', fontWeight: 600 }}>
-              <span className="op-rail-dot" style={{ background: isDark ? '#7DA0CA' : '#021024', boxShadow: isDark ? 'none' : '0 0 0 2px rgba(5, 38, 89, 0.35)' }} />
+            <div className="op-rail-sub" style={{ color: '#052659', fontWeight: 600 }}>At or below reorder threshold</div>
+            <div className="op-rail-footer" style={{ borderTopColor: 'rgba(5, 38, 89, 0.22)', color: '#021024', fontWeight: 600 }}>
+              <span className="op-rail-dot" style={{ background: '#021024', boxShadow: '0 0 0 2px rgba(5, 38, 89, 0.35)' }} />
               <span>Reorder soon</span>
             </div>
           </div>
           <div className="op-rail-right">
-            <span className="op-rail-pct" style={{ color: isDark ? '#C1E8FF' : '#021024', fontWeight: 900 }}>{lowStockPctStr}</span>
-            <div className="op-rail-bar-track" style={{ background: isDark ? 'rgba(5, 38, 89, 0.8)' : 'rgba(5, 38, 89, 0.2)' }}>
+            <span className="op-rail-pct" style={{ color: '#021024', fontWeight: 900 }}>{lowStockPctStr}</span>
+            <div className="op-rail-bar-track" style={{ background: 'rgba(5, 38, 89, 0.2)' }}>
               <div
                 className="op-rail-bar-fill"
                 style={{
                   height: `${Math.min(100, Math.max(12, lowStockPctNum))}%`,
-                  background: isDark ? '#7DA0CA' : 'linear-gradient(180deg, #5483B3 0%, #021024 100%)',
+                  background: 'linear-gradient(180deg, #5483B3 0%, #021024 100%)',
                 }}
               />
             </div>
           </div>
         </div>
 
-        {/* Card 3: Out of Stock (Mocha/Espresso Swatch: #291C0E -> #E1D4C2) */}
+        {/* Card 3: Out of Stock (Mocha/Espresso Swatch) */}
         <div className="op-rail-kpi card-mocha card-red">
           <div className="op-rail-left">
             <div>
-              <div className="op-rail-header" style={{ color: isDark ? '#E1D4C2' : '#291C0E' }}>
-                <AlertCircle size={18} color={isDark ? '#BEB5A9' : '#6E473B'} strokeWidth={2.2} />
+              <div className="op-rail-header" style={{ color: '#291C0E' }}>
+                <AlertCircle size={18} color="#6E473B" strokeWidth={2.2} />
                 <span>Out of Stock</span>
               </div>
-              <div className="op-rail-value" style={{ color: isDark ? '#E1D4C2' : '#291C0E' }}>{outOfStockCount}</div>
+              <div className="op-rail-value" style={{ color: '#291C0E' }}>{outOfStockCount}</div>
             </div>
-            <div className="op-rail-sub" style={{ color: isDark ? '#BEB5A9' : '#291C0E', fontWeight: 600 }}>Supplier replenishment needed</div>
-            <div className="op-rail-footer" style={{ borderTopColor: isDark ? 'rgba(190, 181, 169, 0.2)' : 'rgba(41, 28, 14, 0.22)', color: isDark ? '#BEB5A9' : '#291C0E', fontWeight: 600 }}>
-              <span className="op-rail-dot" style={{ background: isDark ? '#BEB5A9' : '#291C0E', boxShadow: isDark ? 'none' : '0 0 0 2px rgba(110, 71, 59, 0.35)' }} />
+            <div className="op-rail-sub" style={{ color: '#291C0E', fontWeight: 600 }}>Supplier replenishment needed</div>
+            <div className="op-rail-footer" style={{ borderTopColor: 'rgba(41, 28, 14, 0.22)', color: '#291C0E', fontWeight: 600 }}>
+              <span className="op-rail-dot" style={{ background: '#291C0E', boxShadow: '0 0 0 2px rgba(110, 71, 59, 0.35)' }} />
               <span>Action required</span>
             </div>
           </div>
           <div className="op-rail-right">
-            <span className="op-rail-pct" style={{ color: isDark ? '#E1D4C2' : '#291C0E', fontWeight: 900 }}>{outOfStockPctStr}</span>
-            <div className="op-rail-bar-track" style={{ background: isDark ? 'rgba(41, 28, 14, 0.8)' : 'rgba(41, 28, 14, 0.2)' }}>
+            <span className="op-rail-pct" style={{ color: '#291C0E', fontWeight: 900 }}>{outOfStockPctStr}</span>
+            <div className="op-rail-bar-track" style={{ background: 'rgba(41, 28, 14, 0.2)' }}>
               <div
                 className="op-rail-bar-fill"
                 style={{
                   height: `${Math.min(100, Math.max(15, outOfStockPctNum))}%`,
-                  background: isDark ? '#BEB5A9' : 'linear-gradient(180deg, #6E473B 0%, #291C0E 100%)',
+                  background: 'linear-gradient(180deg, #6E473B 0%, #291C0E 100%)',
                 }}
               />
             </div>
@@ -425,7 +420,7 @@ export const InventoryPage: React.FC = () => {
             onClick={() => setActiveView('receipts')}
             style={{ ...getMainTabStyle(activeView === 'receipts'), display: 'flex', alignItems: 'center', gap: 6 }}
           >
-            <Receipt size={14} color={activeView === 'receipts' ? '#ffffff' : (isDark ? '#2dd4bf' : '#0D9488')} />
+            <Receipt size={14} color={activeView === 'receipts' ? '#ffffff' : '#0D9488'} />
             <span>Goods Receipt & Procurement Ledger</span>
           </button>
         </div>
@@ -494,7 +489,7 @@ export const InventoryPage: React.FC = () => {
           <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--rf-text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
             <Filter size={13} /> Classification:
           </span>
-          <div className="tabs" style={{ background: isDark ? 'rgba(30, 41, 59, 0.5)' : 'rgba(148, 163, 184, 0.12)', padding: 3, borderRadius: 10, border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.04)' }}>
+          <div className="tabs" style={{ background: 'rgba(148, 163, 184, 0.12)', padding: 3, borderRadius: 10, border: '1px solid rgba(0, 0, 0, 0.04)' }}>
             <button
               type="button"
               className={`tab ${typeFilter === 'ALL' ? 'on' : ''}`}
@@ -734,7 +729,7 @@ export const InventoryPage: React.FC = () => {
       ) : (
         /* PER-PRODUCT GOODS RECEIPT & PROCUREMENT LEDGER */
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Procurement Financial KPI Highlights (Elegant Gradients for Light & Dark) */}
+          {/* Procurement Financial KPI Highlights */}
           <div className="row" style={{ gap: 14 }}>
             {/* Box 1: Total Procurement Spend */}
             <div
@@ -743,27 +738,23 @@ export const InventoryPage: React.FC = () => {
                 flex: 1,
                 padding: '18px 22px',
                 borderRadius: 16,
-                background: isDark
-                  ? 'linear-gradient(135deg, rgba(13, 148, 136, 0.24) 0%, rgba(15, 30, 36, 0.85) 60%, #16202c 100%)'
-                  : 'linear-gradient(135deg, rgba(204, 251, 241, 0.75) 0%, rgba(240, 253, 250, 0.9) 55%, #ffffff 100%)',
-                border: isDark ? '1px solid rgba(45, 212, 191, 0.3)' : '1px solid rgba(13, 148, 136, 0.25)',
-                borderLeft: isDark ? '4px solid #2dd4bf' : '4px solid #0d9488',
-                boxShadow: isDark
-                  ? '0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(45, 212, 191, 0.08)'
-                  : '0 4px 16px rgba(13, 148, 136, 0.08)',
+                background: 'linear-gradient(135deg, rgba(204, 251, 241, 0.75) 0%, rgba(240, 253, 250, 0.9) 55%, #ffffff 100%)',
+                border: '1px solid rgba(13, 148, 136, 0.25)',
+                borderLeft: '4px solid #0d9488',
+                boxShadow: '0 4px 16px rgba(13, 148, 136, 0.08)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               }}
             >
-              <div className="l" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13.5, color: isDark ? '#5eead4' : '#0f766e' }}>
-                <Receipt size={17} color={isDark ? '#2dd4bf' : '#0d9488'} />
+              <div className="l" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13.5, color: '#0f766e' }}>
+                <Receipt size={17} color="#0d9488" />
                 <span>Total Procurement Spend</span>
               </div>
-              <div className="v" style={{ color: isDark ? '#2dd4bf' : '#0f766e', fontSize: 26, fontWeight: 800, margin: '8px 0 4px', fontFeatureSettings: '"tnum"' }}>
+              <div className="v" style={{ color: '#0f766e', fontSize: 26, fontWeight: 800, margin: '8px 0 4px', fontFeatureSettings: '"tnum"' }}>
                 {isAdmin
                   ? `LKR ${goodsReceiptSummary.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                   : 'Confidential (Admin)'}
               </div>
-              <div className="sub" style={{ fontSize: 12.5, color: isDark ? '#a6b3c1' : '#64748b' }}>
+              <div className="sub" style={{ fontSize: 12.5, color: '#64748b' }}>
                 {isAdmin ? 'Recorded supplier replenishment wholesale investment' : 'Wholesale expenditure restricted'}
               </div>
             </div>
@@ -775,25 +766,21 @@ export const InventoryPage: React.FC = () => {
                 flex: 1,
                 padding: '18px 22px',
                 borderRadius: 16,
-                background: isDark
-                  ? 'linear-gradient(135deg, rgba(37, 99, 235, 0.24) 0%, rgba(20, 28, 48, 0.85) 60%, #16202c 100%)'
-                  : 'linear-gradient(135deg, rgba(224, 231, 255, 0.75) 0%, rgba(238, 242, 255, 0.9) 55%, #ffffff 100%)',
-                border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid rgba(37, 99, 235, 0.25)',
-                borderLeft: isDark ? '4px solid #60a5fa' : '4px solid #2563eb',
-                boxShadow: isDark
-                  ? '0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(96, 165, 250, 0.08)'
-                  : '0 4px 16px rgba(37, 99, 235, 0.08)',
+                background: 'linear-gradient(135deg, rgba(224, 231, 255, 0.75) 0%, rgba(238, 242, 255, 0.9) 55%, #ffffff 100%)',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
+                borderLeft: '4px solid #2563eb',
+                boxShadow: '0 4px 16px rgba(37, 99, 235, 0.08)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               }}
             >
-              <div className="l" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13.5, color: isDark ? '#93c5fd' : '#1d4ed8' }}>
-                <Package size={17} color={isDark ? '#60a5fa' : '#2563eb'} />
+              <div className="l" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13.5, color: '#1d4ed8' }}>
+                <Package size={17} color="#2563eb" />
                 <span>Total Units Received</span>
               </div>
-              <div className="v" style={{ color: isDark ? '#93c5fd' : '#1e3a8a', fontSize: 26, fontWeight: 800, margin: '8px 0 4px', fontFeatureSettings: '"tnum"' }}>
+              <div className="v" style={{ color: '#1e3a8a', fontSize: 26, fontWeight: 800, margin: '8px 0 4px', fontFeatureSettings: '"tnum"' }}>
                 {goodsReceiptSummary.totalUnits} items
               </div>
-              <div className="sub" style={{ fontSize: 12.5, color: isDark ? '#a6b3c1' : '#64748b' }}>
+              <div className="sub" style={{ fontSize: 12.5, color: '#64748b' }}>
                 Physical optical goods checked into live inventory
               </div>
             </div>
@@ -805,25 +792,21 @@ export const InventoryPage: React.FC = () => {
                 flex: 1,
                 padding: '18px 22px',
                 borderRadius: 16,
-                background: isDark
-                  ? 'linear-gradient(135deg, rgba(217, 119, 6, 0.24) 0%, rgba(38, 28, 18, 0.85) 60%, #16202c 100%)'
-                  : 'linear-gradient(135deg, rgba(254, 243, 199, 0.75) 0%, rgba(255, 251, 235, 0.9) 55%, #ffffff 100%)',
-                border: isDark ? '1px solid rgba(251, 191, 36, 0.3)' : '1px solid rgba(217, 119, 6, 0.25)',
-                borderLeft: isDark ? '4px solid #fbbf24' : '4px solid #d97706',
-                boxShadow: isDark
-                  ? '0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(251, 191, 36, 0.08)'
-                  : '0 4px 16px rgba(217, 119, 6, 0.08)',
+                background: 'linear-gradient(135deg, rgba(254, 243, 199, 0.75) 0%, rgba(255, 251, 235, 0.9) 55%, #ffffff 100%)',
+                border: '1px solid rgba(217, 119, 6, 0.25)',
+                borderLeft: '4px solid #d97706',
+                boxShadow: '0 4px 16px rgba(217, 119, 6, 0.08)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               }}
             >
-              <div className="l" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13.5, color: isDark ? '#fde68a' : '#b45309' }}>
-                <FileText size={17} color={isDark ? '#fbbf24' : '#d97706'} />
+              <div className="l" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13.5, color: '#b45309' }}>
+                <FileText size={17} color="#d97706" />
                 <span>Supplier Delivery Bills</span>
               </div>
-              <div className="v" style={{ color: isDark ? '#fbbf24' : '#92400e', fontSize: 26, fontWeight: 800, margin: '8px 0 4px', fontFeatureSettings: '"tnum"' }}>
+              <div className="v" style={{ color: '#92400e', fontSize: 26, fontWeight: 800, margin: '8px 0 4px', fontFeatureSettings: '"tnum"' }}>
                 {goodsReceiptSummary.totalShipments} invoices
               </div>
-              <div className="sub" style={{ fontSize: 12.5, color: isDark ? '#a6b3c1' : '#64748b' }}>
+              <div className="sub" style={{ fontSize: 12.5, color: '#64748b' }}>
                 Supplier shipments verified & reconciled
               </div>
             </div>

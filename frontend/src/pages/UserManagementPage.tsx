@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
 import api from '../services/api';
 import { User, AuditLog } from '../types';
 import { StatusBadge } from '../components/Common/StatusBadge';
@@ -20,8 +19,6 @@ import {
 } from 'lucide-react';
 
 export const UserManagementPage: React.FC = () => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'users' | 'audit'>('users');
   const [users, setUsers] = useState<User[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -280,9 +277,9 @@ export const UserManagementPage: React.FC = () => {
                           fontSize: 12.5,
                           fontWeight: 600,
                           letterSpacing: '0.01em',
-                          color: isDark ? '#E2E8F0' : '#1E293B',
-                          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F1F5F9',
-                          border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #CBD5E1',
+                          color: '#1E293B',
+                          backgroundColor: '#F1F5F9',
+                          border: '1px solid #CBD5E1',
                           padding: '3px 8px',
                           borderRadius: 6,
                           display: 'inline-flex',
@@ -290,7 +287,7 @@ export const UserManagementPage: React.FC = () => {
                           gap: 3,
                         }}
                       >
-                        <span style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: 700 }}>@</span>
+                        <span style={{ color: '#64748B', fontSize: 11, fontWeight: 700 }}>@</span>
                         <span>{u.username}</span>
                       </span>
                     </td>
@@ -308,9 +305,9 @@ export const UserManagementPage: React.FC = () => {
                             fontSize: 12,
                             fontWeight: 600,
                             whiteSpace: 'nowrap',
-                            backgroundColor: isDark ? 'rgba(59, 130, 246, 0.16)' : '#EFF6FF',
-                            color: isDark ? '#93C5FD' : '#1D4ED8',
-                            border: isDark ? '1px solid rgba(59, 130, 246, 0.35)' : '1px solid #BFDBFE',
+                            backgroundColor: '#EFF6FF',
+                            color: '#1D4ED8',
+                            border: '1px solid #BFDBFE',
                           }}
                         >
                           <Shield size={12} />
@@ -328,9 +325,9 @@ export const UserManagementPage: React.FC = () => {
                             fontSize: 12,
                             fontWeight: 600,
                             whiteSpace: 'nowrap',
-                            backgroundColor: isDark ? 'rgba(20, 184, 166, 0.16)' : '#F0FDFA',
-                            color: isDark ? '#5EEAD4' : '#0F766E',
-                            border: isDark ? '1px solid rgba(20, 184, 166, 0.35)' : '1px solid #99F6E4',
+                            backgroundColor: '#F0FDFA',
+                            color: '#0F766E',
+                            border: '1px solid #99F6E4',
                           }}
                         >
                           <UserIcon size={12} />
@@ -354,9 +351,9 @@ export const UserManagementPage: React.FC = () => {
                             gap: 5,
                             fontSize: 12,
                             fontWeight: 600,
-                            color: isDark ? '#94A3B8' : '#64748B',
-                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #E2E8F0',
+                            color: '#64748B',
+                            backgroundColor: '#F8FAFC',
+                            border: '1px solid #E2E8F0',
                             padding: '4px 12px',
                             borderRadius: 6,
                           }}
@@ -381,28 +378,28 @@ export const UserManagementPage: React.FC = () => {
                             outline: 'none',
                             ...(u.is_active
                               ? {
-                                  backgroundColor: isDark ? 'rgba(239, 68, 68, 0.14)' : '#FEF2F2',
-                                  color: isDark ? '#F87171' : '#DC2626',
-                                  border: isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid #FECACA',
+                                  backgroundColor: '#FEF2F2',
+                                  color: '#DC2626',
+                                  border: '1px solid #FECACA',
                                 }
                               : {
-                                  backgroundColor: isDark ? 'rgba(16, 185, 129, 0.14)' : '#ECFDF5',
-                                  color: isDark ? '#34D399' : '#059669',
-                                  border: isDark ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid #A7F3D0',
+                                  backgroundColor: '#ECFDF5',
+                                  color: '#059669',
+                                  border: '1px solid #A7F3D0',
                                 }),
                           }}
                           onMouseEnter={(e) => {
                             if (u.is_active) {
-                              e.currentTarget.style.backgroundColor = isDark ? 'rgba(239, 68, 68, 0.25)' : '#FEE2E2';
+                              e.currentTarget.style.backgroundColor = '#FEE2E2';
                             } else {
-                              e.currentTarget.style.backgroundColor = isDark ? 'rgba(16, 185, 129, 0.25)' : '#D1FAE5';
+                              e.currentTarget.style.backgroundColor = '#D1FAE5';
                             }
                           }}
                           onMouseLeave={(e) => {
                             if (u.is_active) {
-                              e.currentTarget.style.backgroundColor = isDark ? 'rgba(239, 68, 68, 0.14)' : '#FEF2F2';
+                              e.currentTarget.style.backgroundColor = '#FEF2F2';
                             } else {
-                              e.currentTarget.style.backgroundColor = isDark ? 'rgba(16, 185, 129, 0.14)' : '#ECFDF5';
+                              e.currentTarget.style.backgroundColor = '#ECFDF5';
                             }
                           }}
                         >
